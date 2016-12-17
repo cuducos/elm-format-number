@@ -1,0 +1,4 @@
+*.elm
+Doc/
+elm-package.json
+elm-stuff/
