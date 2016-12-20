@@ -45,7 +45,7 @@ formatFloat alternativeLocale -7654.3210 == "-7.654,321"
 formatFloat yetAnotherLocale -0.01 == "0.0"
 ```
 
-### From `Int` do `String`
+### From `Int` to `String`
 
 ```elm
 formatInt : Locale -> Int -> String
