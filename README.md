@@ -4,7 +4,7 @@ This simple [Elm](http://elm-lang.com) package formats numbers as pretty strings
 
 ## Usage
 
-### From `Float` do `String`
+### From `Float` to `String`
 
 ```elm
 formatFloat : Int -> String -> String -> Float -> String
@@ -18,7 +18,7 @@ formatFloat 3 "." "," -7654.3210 == "-7.654,321"
 formatFloat 1 "," "." -0.01 == "0.0"
 ```
 
-### From `Int` do `String`
+### From `Int` to `String`
 
 ```elm
 formatInt : Int -> String -> String -> Int -> String
