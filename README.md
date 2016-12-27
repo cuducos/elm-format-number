@@ -4,31 +4,58 @@ This simple [Elm](http://elm-lang.com) package formats numbers as pretty strings
 
 ## Usage
 
+### Creating a custom `Locale`
+
+The `Locale` is a `type alias` to hold all the information to format your strings. For example:
+
+```elm
+defaultLocale : Locale
+defaultLocale =
+    { decimals = 2
+    , thousandSeparator = ","
+    , decimalSeparator = "."
+    }
+
+alternativeLocale : Locale
+alternativeLocale =
+    { decimals = 3
+    , thousandSeparator = "."
+    , decimalSeparator = ","
+    }
+
+yetAnotherLocale : Locale
+yetAnotherLocale =
+    { decimals = 1
+    , thousandSeparator = ""
+    , decimalSeparator = "."
+    }
+```
+
 ### From `Float` do `String`
 
 ```elm
-formatFloat : Int -> String -> String -> Float -> String
+formatFloat : Locale -> Float -> String
 ```
 
-Format a float number as a pretty string. The four arguments are: number of decimals, thousand separator, decimal separator and the float number itself.
+Format a `Float` number as a pretty string. For example, using the locales defined above:
 
 ```elm
-formatFloat 2 "," "." 1234.5567 == "1,234.56"
-formatFloat 3 "." "," -7654.3210 == "-7.654,321"
-formatFloat 1 "," "." -0.01 == "0.0"
+formatFloat defaultLocale 1234.5567 == "1,234.56"
+formatFloat alternativeLocale -7654.3210 == "-7.654,321"
+formatFloat yetAnotherLocale -0.01 == "0.0"
 ```
 
 ### From `Int` do `String`
 
 ```elm
-formatInt : Int -> String -> String -> Int -> String
+formatInt : Locale -> Int -> String
 ```
 
-Format a float number as a pretty string. The four arguments are: number of decimals, thousand separator, decimal separator and the float number itself.
+Format a `Int` number as a pretty string. For example, using the locales defined above:
 
 ```elm
-formatInt 1 "," "." 0 == "0.0"
-formatInt 1 "," "." 1234567890 == "1,234,567,890.0"
+formatInt defaultLocale 0 == "0.00"
+formatInt defaultLocale 1234567890 == "1,234,567,890.0"
 ```
 
 ## Tests

@@ -1,36 +1,49 @@
-module FormatNumber exposing (..)
+module FormatNumber exposing (Locale, formatFloat, formatInt)
 
 {-| This simple package formats numbers as pretty strings. It is flexible
 enough to deal with different number of decimals, different thousand
 separators and diffetent decimal separator.
 
+# Locale
+@docs Locale
+
 # Usage
+
 @docs formatFloat, formatInt
+
 
 -}
 
 import String
 
 
-{-| Format a float number as a pretty string. The four arguments are: number of
-decimals, thousand separator, decimal separator and the float number itself.
+{-| Locale to configure the format options.
+-}
+type alias Locale =
+    { decimals : Int
+    , thousandSeparator : String
+    , decimalSeparator : String
+    }
 
-    >>> formatFloat 2 "," "." 1234.5567
+
+{-| Format a float number as a pretty string:
+
+    >>> formatFloat { decimals = 2, thousandSeparator = ",", decimalSeparator = "." } 1234.5567
     "1,234.56"
 
-    >>> formatFloat 3 "." "," -7654.3210
+    >>> formatFloat (Locale 3 "." ",") -7654.3210
     "-7.654,321"
 
-    >>> formatFloat 1 "," "." -0.01
+    >>> formatFloat (Locale 1 "," ".") -0.01
     "0.0"
 
 -}
-formatFloat : Int -> String -> String -> Float -> String
-formatFloat decimals thousandSeparetor decimalSeparator num =
+formatFloat : Locale -> Float -> String
+formatFloat locale num =
     let
         multiplier : Int
         multiplier =
-            10 ^ decimals
+            10 ^ locale.decimals
 
         digits : Int
         digits =
@@ -38,24 +51,23 @@ formatFloat decimals thousandSeparetor decimalSeparator num =
                 |> (*) (toFloat multiplier)
                 |> round
     in
-        if digits == 0 then
-            formattedZero decimals decimalSeparator
-        else
-            formattedNumber decimals thousandSeparetor decimalSeparator digits
+        formattedNumber locale digits
 
 
-{-| Format a float number as a pretty string. The four arguments are: number of
-decimals, thousand separator, decimal separator and the float number itself.
-    >>> formatInt 1 "," "." 0
+{-| Format a integer number as a pretty string:
+
+    >>> formatInt { decimals = 1, thousandSeparator = ",", decimalSeparator = "." } 0
     "0.0"
 
-    >>> formatInt 1 "," "." 1234567890
+    >>> formatInt (Locale 1 "," ".") 1234567890
     "1,234,567,890.0"
 
 -}
-formatInt : Int -> String -> String -> Int -> String
-formatInt decimals thousandSeparetor decimalSeparator num =
-    formatFloat decimals thousandSeparetor decimalSeparator (toFloat num)
+formatInt : Locale -> Int -> String
+formatInt locale num =
+    num
+        |> toFloat
+        |> formatFloat locale
 
 
 
@@ -64,35 +76,25 @@ formatInt decimals thousandSeparetor decimalSeparator num =
 --
 
 
-{-| Zero has a special formatting function:
+formattedNumber : Locale -> Int -> String
+formattedNumber locale num =
+    if num == 0 then
+        formattedZero locale
+    else
+        formattedNonZeroNumber locale num
 
-    >>> formattedZero 1 ","
-    "0,0"
 
-    >>> formattedZero 2 "."
-    "0.00"
-
--}
-formattedZero : Int -> String -> String
-formattedZero decimals decimalSeparator =
+formattedZero : Locale -> String
+formattedZero locale =
     String.concat
         [ "0"
-        , decimalSeparator
-        , String.repeat decimals "0"
+        , locale.decimalSeparator
+        , String.repeat locale.decimals "0"
         ]
 
 
-{-| Format an `Int` given the amount of decimal places:
-
-    >>> formattedNumber 4 "," "." 31415
-    "3.1415"
-
-    >>> formattedNumber 1 "." "," 1234567890
-    "123.456.789,0"
-
--}
-formattedNumber : Int -> String -> String -> Int -> String
-formattedNumber decimals thousandSeparetor decimalSeparator num =
+formattedNonZeroNumber : Locale -> Int -> String
+formattedNonZeroNumber locale num =
     let
         digits : String
         digits =
@@ -100,37 +102,25 @@ formattedNumber decimals thousandSeparetor decimalSeparator num =
 
         intDigits : String
         intDigits =
-            String.dropRight decimals digits
+            String.dropRight locale.decimals digits
 
         decDigits : String
         decDigits =
-            String.right decimals digits
+            String.right locale.decimals digits
     in
         String.concat
-            [ addThousandSeparator thousandSeparetor intDigits
-            , decimalSeparator
+            [ addThousandSeparator locale intDigits
+            , locale.decimalSeparator
             , decDigits
             ]
 
 
-{-| Add thousand separtor to a number (as `String`):
-
-    >>> addThousandSeparator "," "42"
-    "42"
-
-    >>> addThousandSeparator "." "6318"
-    "6.318"
-
-    >>> addThousandSeparator "," "1234567"
-    "1,234,567"
-
--}
-addThousandSeparator : String -> String -> String
-addThousandSeparator separator num =
+addThousandSeparator : Locale -> String -> String
+addThousandSeparator locale num =
     let
         parts : List String
         parts =
-            String.split separator num
+            String.split locale.thousandSeparator num
 
         firstPart : String
         firstPart =
@@ -148,14 +138,14 @@ addThousandSeparator separator num =
                     newFirstPart =
                         String.dropRight 3 firstPart
                 in
-                    [ addThousandSeparator separator newFirstPart
+                    [ addThousandSeparator locale newFirstPart
                     , String.right 3 firstPart
                     ]
             else
                 [ firstPart ]
     in
-        String.join separator <|
-            List.concat
-                [ firstParts
-                , remainingParts
-                ]
+        List.concat
+            [ firstParts
+            , remainingParts
+            ]
+            |> String.join locale.thousandSeparator
