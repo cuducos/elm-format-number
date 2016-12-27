@@ -1,4 +1,4 @@
-module FormatNumber exposing (formatInt, formatFloat)
+module FormatNumber exposing (..)
 
 {-| This simple package formats numbers as pretty strings. It is flexible
 enough to deal with different number of decimals, different thousand
@@ -23,6 +23,7 @@ decimals, thousand separator, decimal separator and the float number itself.
 
     >>> formatFloat 1 "," "." -0.01
     "0.0"
+
 -}
 formatFloat : Int -> String -> String -> Float -> String
 formatFloat decimals thousandSeparetor decimalSeparator num =
@@ -63,6 +64,15 @@ formatInt decimals thousandSeparetor decimalSeparator num =
 --
 
 
+{-| Zero has a special formatting function:
+
+    >>> formattedZero 1 ","
+    "0,0"
+
+    >>> formattedZero 2 "."
+    "0.00"
+
+-}
 formattedZero : Int -> String -> String
 formattedZero decimals decimalSeparator =
     String.concat
@@ -72,6 +82,15 @@ formattedZero decimals decimalSeparator =
         ]
 
 
+{-| Format an `Int` given the amount of decimal places:
+
+    >>> formattedNumber 4 "," "." 31415
+    "3.1415"
+
+    >>> formattedNumber 1 "." "," 1234567890
+    "123.456.789,0"
+
+-}
 formattedNumber : Int -> String -> String -> Int -> String
 formattedNumber decimals thousandSeparetor decimalSeparator num =
     let
@@ -94,6 +113,18 @@ formattedNumber decimals thousandSeparetor decimalSeparator num =
             ]
 
 
+{-| Add thousand separtor to a number (as `String`):
+
+    >>> addThousandSeparator "," "42"
+    "42"
+
+    >>> addThousandSeparator "." "6318"
+    "6.318"
+
+    >>> addThousandSeparator "," "1234567"
+    "1,234,567"
+
+-}
 addThousandSeparator : String -> String -> String
 addThousandSeparator separator num =
     let
