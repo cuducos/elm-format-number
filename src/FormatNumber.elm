@@ -59,17 +59,17 @@ formatFloat locale num =
 {-| Format a integer number as a pretty string:
 
     >>> formatInt { decimals = 1, thousandSeparator = ",", decimalSeparator = "." } 0
-    "0.0"
+    "0"
 
     >>> formatInt (Locale 1 "," ".") 1234567890
-    "1,234,567,890.0"
+    "1,234,567,890"
 
 -}
 formatInt : Locale -> Int -> String
 formatInt locale num =
     num
         |> toFloat
-        |> formatFloat locale
+        |> formatFloat { locale | decimals = 0 }
 
 
 
@@ -86,11 +86,19 @@ formattedNumber locale num =
         formattedNonZeroNumber locale num
 
 
+separator : Locale -> String
+separator locale =
+    if locale.decimals == 0 then
+        ""
+    else
+        locale.decimalSeparator
+
+
 formattedZero : Locale -> String
 formattedZero locale =
     String.concat
         [ "0"
-        , locale.decimalSeparator
+        , separator locale
         , String.repeat locale.decimals "0"
         ]
 
@@ -109,17 +117,10 @@ formattedNonZeroNumber locale num =
         decDigits : String
         decDigits =
             String.right locale.decimals digits
-
-        separator : String
-        separator =
-            if locale.decimals == 0 then
-                ""
-            else
-                locale.decimalSeparator
     in
         String.concat
             [ addThousandSeparator locale intDigits
-            , separator
+            , separator locale
             , decDigits
             ]
 
