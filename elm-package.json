@@ -1,7 +1,7 @@
 {
-    "version": "2.0.0",
+    "version": "3.0.0",
     "summary": "Format numbers as pretty strings",
-    "repository": "https://github.com/cuducos/elm-format-number.git",
+    "repository": "https://github.com/lovasoa/elm-format-number.git",
     "license": "BSD3",
     "source-directories": [
         "./src/"

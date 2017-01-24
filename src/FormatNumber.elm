@@ -37,6 +37,8 @@ type alias Locale =
     >>> formatFloat (Locale 1 "," ".") -0.01
     "0.0"
 
+    >>> formatFloat (Locale 0 "," ".") 123.456
+    "123"
 -}
 formatFloat : Locale -> Float -> String
 formatFloat locale num =
@@ -107,10 +109,17 @@ formattedNonZeroNumber locale num =
         decDigits : String
         decDigits =
             String.right locale.decimals digits
+
+        separator : String
+        separator =
+            if locale.decimals == 0 then
+                ""
+            else
+                locale.decimalSeparator
     in
         String.concat
             [ addThousandSeparator locale intDigits
-            , locale.decimalSeparator
+            , separator
             , decDigits
             ]
 
@@ -144,8 +153,5 @@ addThousandSeparator locale num =
             else
                 [ firstPart ]
     in
-        List.concat
-            [ firstParts
-            , remainingParts
-            ]
+        List.concat [ firstParts, remainingParts ]
             |> String.join locale.thousandSeparator
