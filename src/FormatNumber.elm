@@ -38,6 +38,9 @@ type alias Locale =
     >>> formatFloat (Locale 1 "," ".") -0.01
     "0.0"
 
+    >>> formatFloat (Locale 2 "," ".") 0.01
+    "0.01"
+
     >>> formatFloat (Locale 0 "," ".") 123.456
     "123"
 

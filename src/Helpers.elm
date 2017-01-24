@@ -14,8 +14,14 @@ module Helpers exposing (..)
     >>> nDigits 2 1.0
     "00"
 
-    >>> nDigits 2 -1.0
+    >>> nDigits 2 -1.0001
     "00"
+
+    >>> nDigits 2 0.01
+    "01"
+
+    >>> nDigits 2 0.10
+    "10"
 -}
 
 
@@ -31,7 +37,7 @@ nDigits digits f =
         splitIntRec fint []
             |> String.concat
             |> String.right digits
-            |> String.padRight digits '0'
+            |> String.padLeft digits '0'
 
 
 {-| Recursive helper to format an integer
