@@ -1,21 +1,42 @@
-module FormatNumber exposing (Locale, formatFloat, formatInt)
+module FormatNumber
+    exposing
+        ( Locale
+        , formatFloat
+        , formatInt
+        , usLocale
+        , frenchLocale
+        , spanishLocale
+        )
 
 {-| This simple package formats numbers as pretty strings. It is flexible
 enough to deal with different number of decimals, different thousand
 separators and diffetent decimal separator.
 
 # Locale
-@docs Locale
+@docs Locale, usLocale , frenchLocale, spanishLocale
 
 # Usage
 
 @docs formatFloat, formatInt
 
+# Known bugs
 
+There are known bugs in how elm handles large numbers:
+
+ * https://github.com/elm-lang/elm-compiler/issues/264
+ * https://github.com/elm-lang/elm-compiler/issues/1246
+
+This library won't work with large numbers (over 2^31) until elm itself is fixed
+
+    >>> formatFloat usLocale 1e10
+    "1,410,065,408.00"
 -}
 
 import String
 import Helpers exposing (..)
+
+
+-- Locales
 
 
 {-| Locale to configure the format options.
@@ -25,6 +46,42 @@ type alias Locale =
     , thousandSeparator : String
     , decimalSeparator : String
     }
+
+
+
+-- Locales from
+-- https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html
+
+
+{-| locale used in France, Canada, Finland, Sweden
+    >>> formatFloat frenchLocale 67295
+    "67 295,000"
+-}
+frenchLocale : Locale
+frenchLocale =
+    Locale 3 " " ","
+
+
+{-| locale used in the United States, Great Britain, and Thailand
+    >>> formatFloat usLocale 67295
+    "67,295.00"
+-}
+usLocale : Locale
+usLocale =
+    Locale 2 "," "."
+
+
+{-| locale used in the United States, Great Britain, and Thailand
+    >>> formatFloat spanishLocale 67295
+    "67.295,000"
+-}
+spanishLocale : Locale
+spanishLocale =
+    Locale 3 "." ","
+
+
+
+-- Functions
 
 
 {-| Format a float number as a pretty string:

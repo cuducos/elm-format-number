@@ -1,5 +1,5 @@
 {
-    "version": "1.0.2",
+    "version": "1.0.3",
     "summary": "Format numbers as pretty strings",
     "repository": "https://github.com/lovasoa/elm-format-number.git",
     "license": "BSD3",
