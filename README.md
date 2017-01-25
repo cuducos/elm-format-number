@@ -15,20 +15,6 @@ defaultLocale =
     , thousandSeparator = ","
     , decimalSeparator = "."
     }
-
-alternativeLocale : Locale
-alternativeLocale =
-    { decimals = 3
-    , thousandSeparator = "."
-    , decimalSeparator = ","
-    }
-
-yetAnotherLocale : Locale
-yetAnotherLocale =
-    { decimals = 1
-    , thousandSeparator = ""
-    , decimalSeparator = "."
-    }
 ```
 
 ### From `Float` do `String`
@@ -37,12 +23,10 @@ yetAnotherLocale =
 formatFloat : Locale -> Float -> String
 ```
 
-Format a `Float` number as a pretty string. For example, using the locales defined above:
+Format a `Float` number as a pretty string. For example, using the locale defined above:
 
 ```elm
 formatFloat defaultLocale 1234.5567 == "1,234.56"
-formatFloat alternativeLocale -7654.3210 == "-7.654,321"
-formatFloat yetAnotherLocale -0.01 == "0.0"
 ```
 
 ### From `Int` to `String`
@@ -51,11 +35,10 @@ formatFloat yetAnotherLocale -0.01 == "0.0"
 formatInt : Locale -> Int -> String
 ```
 
-Format a `Int` number as a pretty string. For example, using the locales defined above:
+Format a `Int` number as a pretty string. For example, using the locale defined above:
 
 ```elm
-formatInt defaultLocale 0 == "0.00"
-formatInt defaultLocale 1234567890 == "1,234,567,890.0"
+formatInt defaultLocale 0 == "0"
 ```
 
 ## Tests
