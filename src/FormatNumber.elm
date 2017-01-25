@@ -71,7 +71,7 @@ usLocale =
     Locale 2 "," "."
 
 
-{-| locale used in the United States, Great Britain, and Thailand
+{-| locale used in Spain, Italy and Norway
     >>> formatFloat spanishLocale 67295
     "67.295,000"
 -}
