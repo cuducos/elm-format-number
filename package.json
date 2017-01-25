@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/lovasoa/elm-format-number#readme",
   "devDependencies": {
+    "elm": "^0.18.0",
     "elm-doc-test": "^2.1.1",
     "elm-test": "^0.18.2"
   }
