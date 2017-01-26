@@ -111,7 +111,7 @@ formatFloat : Locale -> Float -> String
 formatFloat locale num =
     (formatInt locale (truncate num))
         ++ (separator locale)
-        ++ (nDigits locale.decimals num)
+        ++ (digits locale.decimals num)
 
 
 {-| Format a integer number as a pretty string:

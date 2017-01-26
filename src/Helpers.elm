@@ -1,32 +1,34 @@
 module Helpers exposing (..)
 
-{-| Returns the n first digits after the comma in a float
-
-    >>> nDigits 2 123.45
-    "45"
-
-    >>> nDigits 0 125
-    ""
-
-    >>> nDigits 1 1.99
-    "0"
-
-    >>> nDigits 2 1.0
-    "00"
-
-    >>> nDigits 2 -1.0001
-    "00"
-
-    >>> nDigits 2 0.01
-    "01"
-
-    >>> nDigits 2 0.10
-    "10"
+{-| Module containing helper functions
 -}
 
 
-nDigits : Int -> Float -> String
-nDigits digits f =
+{-| Returns the n first digits after the comma in a float
+
+    >>> digits 2 123.45
+    "45"
+
+    >>> digits 0 125
+    ""
+
+    >>> digits 1 1.99
+    "0"
+
+    >>> digits 2 1.0
+    "00"
+
+    >>> digits 2 -1.0001
+    "00"
+
+    >>> digits 2 0.01
+    "01"
+
+    >>> digits 2 0.10
+    "10"
+-}
+digits : Int -> Float -> String
+digits digits f =
     let
         multiplicator =
             toFloat (10 ^ digits)
