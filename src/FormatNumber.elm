@@ -12,21 +12,36 @@ module FormatNumber
 enough to deal with different number of decimals, different thousand
 separators and diffetent decimal separator.
 
-# Locale
+# Basic usage
+
+    >>> formatFloat {usLocale | decimals = 4} pi
+    "3.1416"
+
+    >>> formatInt frenchLocale 42042
+    "42 042"
+
+    >>> formatFloat spanishLocale e
+    "2,718"
+
+    >>> formatFloat {decimals=3, thousandSeparator="", decimalSeparator=","} 123456.789
+    "123456,789"
+
+# Full documentation
+## Locale
 @docs Locale, usLocale , frenchLocale, spanishLocale
 
-# Usage
+## Number formatting
 
 @docs formatFloat, formatInt
 
 # Known bugs
 
-There are known bugs in how elm handles large numbers:
+There are known bugs in how Elm handles large numbers:
 
  * https://github.com/elm-lang/elm-compiler/issues/264
  * https://github.com/elm-lang/elm-compiler/issues/1246
 
-This library won't work with large numbers (over 2^31) until elm itself is fixed
+This library won't work with large numbers (over 2^31) until Elm itself is fixed:
 
     >>> formatFloat usLocale 1e10
     "1,410,065,408.00"
