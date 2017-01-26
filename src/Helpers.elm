@@ -36,7 +36,7 @@ digits digits f =
         fint =
             (round (f * multiplicator))
     in
-        splitIntRec fint []
+        splitThousands fint
             |> String.concat
             |> String.right digits
             |> String.padLeft digits '0'
@@ -44,14 +44,21 @@ digits digits f =
 
 {-| Recursive helper to format an integer
 
-    >>> splitIntRec 12345 []
+    >>> splitThousands 12345
     ["12", "345"]
 -}
-splitIntRec : Int -> List String -> List String
-splitIntRec num tmp =
-    if num >= 10 ^ 3 then
-        splitIntRec
-            (num // 10 ^ 3)
-            ((num % 10 ^ 3 |> toString |> String.padLeft 3 '0') :: tmp)
-    else
-        (toString num) :: tmp
+splitThousands : Int -> List String
+splitThousands number =
+    let
+        -- Helper recursive function.
+        -- Adds the last three digits of remainingNumber at the start of accumulator
+        splitRemaining : Int -> List String -> List String
+        splitRemaining remainingNumber accumulator =
+            if remainingNumber >= 10 ^ 3 then
+                splitRemaining
+                    (remainingNumber // 10 ^ 3)
+                    ((remainingNumber % 10 ^ 3 |> toString |> String.padLeft 3 '0') :: accumulator)
+            else
+                (toString remainingNumber) :: accumulator
+    in
+        splitRemaining number []

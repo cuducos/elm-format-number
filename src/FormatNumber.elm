@@ -136,7 +136,7 @@ formatInt locale num =
             "0"
 
         GT ->
-            splitIntRec num [] |> String.join locale.thousandSeparator
+            splitThousands num |> String.join locale.thousandSeparator
 
 
 {-| The separator, or ""
