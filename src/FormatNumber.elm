@@ -14,11 +14,11 @@ separators and diffetent decimal separator.
 
 # Basic usage
 
-    >>> formatFloat {usLocale | decimals = 4} pi
-    "3.1416"
+    >>> formatFloat {frenchLocale | decimals = 4} pi
+    "3,1416"
 
-    >>> formatInt frenchLocale 42042
-    "42 042"
+    >>> formatInt usLocale 42042
+    "42,042"
 
     >>> formatFloat spanishLocale e
     "2,718"
@@ -68,13 +68,15 @@ type alias Locale =
 -- https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html
 
 
-{-| locale used in France, Canada, Finland, Sweden
+{-| Locale used in France, Canada, Finland, Sweden
+  It uses a non-breakable thin space (U+202F) as thousandSeparator.
+
     >>> formatFloat frenchLocale 67295
-    "67 295,000"
+    "67 295,000"
 -}
 frenchLocale : Locale
 frenchLocale =
-    Locale 3 " " ","
+    Locale 3 "\x202F" ","
 
 
 {-| locale used in the United States, Great Britain, and Thailand
