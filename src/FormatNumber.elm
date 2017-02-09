@@ -107,7 +107,7 @@ spanishLocale =
     "1,234.56"
 
     >>> formatFloat (Locale 3 "." ",") -7654.3210
-    "-7.654,321"
+    "−7.654,321"
 
     >>> formatFloat (Locale 1 "," ".") -0.01
     "0.0"
@@ -140,14 +140,14 @@ formatFloat locale num =
     "1 234 567 890"
 
     >>> formatInt (Locale 10 "," ".") -123456
-    "-123,456"
+    "−123,456"
 
 -}
 formatInt : Locale -> Int -> String
 formatInt locale num =
     case compare num 0 of
         LT ->
-            formatInt locale (-num) |> String.cons '-'
+            formatInt locale (-num) |> String.cons '−'
 
         EQ ->
             "0"
