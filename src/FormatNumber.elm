@@ -1,172 +1,125 @@
-module FormatNumber
-    exposing
-        ( Locale
-        , formatFloat
-        , formatInt
-        , usLocale
-        , frenchLocale
-        , spanishLocale
-        )
+module FormatNumber exposing (format)
 
-{-| This simple package formats numbers as pretty strings. It is flexible
-enough to deal with different number of decimals, different thousand
+{-| This simple package formats `float` numbers as pretty strings. It is
+flexible enough to deal with different number of decimals, different thousand
 separators and diffetent decimal separator.
 
-# Basic usage
+@docs format
 
-    >>> formatFloat {frenchLocale | decimals = 4} pi
-    "3,1416"
 
-    >>> formatInt usLocale 42042
-    "42,042"
+## What about `Int` numbers?
 
-    >>> formatFloat spanishLocale e
-    "2,718"
+    >>> import Locales exposing (usLocale)
+    >>> format usLocale (toFloat 1234)
+    "1,234.00"
 
-    >>> formatFloat {decimals=3, thousandSeparator="", decimalSeparator=","} 123456.789
-    "123456,789"
+    >>> import Locales exposing (usLocale)
+    >>> format { usLocale | decimals = 0 } <| toFloat 1234
+    "1,234"
 
-# Full documentation
-## Locale
-@docs Locale, usLocale , frenchLocale, spanishLocale
+## Known bugs
 
-## Number formatting
+There are [known](https://github.com/elm-lang/elm-compiler/issues/264)
+[bugs](https://github.com/elm-lang/elm-compiler/issues/1246) in how Elm handles
+large numbers. This library cannot work with large numbers (over `2 ^ 31`)
+until Elm itself is fixed:
 
-@docs formatFloat, formatInt
-
-# Known bugs
-
-There are known bugs in how Elm handles large numbers:
-
- * https://github.com/elm-lang/elm-compiler/issues/264
- * https://github.com/elm-lang/elm-compiler/issues/1246
-
-This library won't work with large numbers (over 2^31) until Elm itself is fixed:
-
-    >>> formatFloat usLocale 1e10
+    >>> format usLocale 1e10
     "1,410,065,408.00"
+
 -}
 
+import Helpers
+import Locales
 import String
-import Helpers exposing (..)
-
-
--- Locales
-
-
-{-| Locale to configure the format options.
--}
-type alias Locale =
-    { decimals : Int
-    , thousandSeparator : String
-    , decimalSeparator : String
-    }
-
-
-
--- Locales from
--- https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html
-
-
-{-| Locale used in France, Canada, Finland, Sweden
-  It uses a non-breakable thin space (U+202F) as thousandSeparator.
-
-    >>> formatFloat frenchLocale 67295
-    "67 295,000"
--}
-frenchLocale : Locale
-frenchLocale =
-    Locale 3 "\x202F" ","
-
-
-{-| locale used in the United States, Great Britain, and Thailand
-    >>> formatFloat usLocale 67295
-    "67,295.00"
--}
-usLocale : Locale
-usLocale =
-    Locale 2 "," "."
-
-
-{-| locale used in Spain, Italy and Norway
-    >>> formatFloat spanishLocale 67295
-    "67.295,000"
--}
-spanishLocale : Locale
-spanishLocale =
-    Locale 3 "." ","
-
-
-
--- Functions
 
 
 {-| Format a float number as a pretty string:
 
-    >>> formatFloat { decimals = 2, thousandSeparator = ",", decimalSeparator = "." } 1234.5567
+    >>> format { decimals = 2, thousandSeparator = ".", decimalSeparator = "," } 123456.789
+    "123.456,79"
+
+    >>> format { decimals = 2, thousandSeparator = ",", decimalSeparator = "." } 1234.5567
     "1,234.56"
 
-    >>> formatFloat (Locale 3 "." ",") -7654.3210
+    >>> import Locales exposing (Locale)
+    >>> format (Locale 3 "." ",") -7654.3210
     "−7.654,321"
 
-    >>> formatFloat (Locale 1 "," ".") -0.01
+    >>> import Locales exposing (Locale)
+    >>> format (Locale 1 "," ".") -0.01
     "0.0"
 
-    >>> formatFloat (Locale 2 "," ".") 0.01
+    >>> import Locales exposing (Locale)
+    >>> format (Locale 2 "," ".") 0.01
     "0.01"
 
-    >>> formatFloat (Locale 0 "," ".") 123.456
+    >>> import Locales exposing (Locale)
+    >>> format (Locale 0 "," ".") 123.456
     "123"
 
-    >>> formatFloat (Locale 0 "," ".") 1e9
+    >>> import Locales exposing (Locale)
+    >>> format (Locale 0 "," ".") 1e9
     "1,000,000,000"
 
-    >>> formatFloat (Locale 5 "," ".") 1.0
+    >>> import Locales exposing (Locale)
+    >>> format (Locale 5 "," ".") 1.0
     "1.00000"
+
+    >>> import Locales exposing (usLocale)
+    >>> format usLocale pi
+    "3.14"
+
+    >>> import Locales exposing (frenchLocale)
+    >>> format { frenchLocale | decimals = 4 } pi
+    "3,1416"
+
+    >>> import Locales exposing (frenchLocale)
+    >>> format frenchLocale 67295
+    "67 295,000"
+
+    >>> import Locales exposing (spanishLocale)
+    >>> format spanishLocale e
+    "2,718"
+
+    >>> import Locales exposing (spanishLocale)
+    >>> format spanishLocale 67295
+    "67.295,000"
+
+    >>> import Locales exposing (usLocale)
+    >>> format usLocale 67295
+    "67,295.00"
+
 -}
-formatFloat : Locale -> Float -> String
-formatFloat locale num =
-    (formatInt locale (truncate num))
-        ++ (separator locale)
-        ++ (digits locale.decimals num)
+format : Locales.Locale -> Float -> String
+format locale num =
+    let
+        truncated : Int
+        truncated =
+            truncate num
 
+        integers : String
+        integers =
+            case compare truncated 0 of
+                GT ->
+                    truncated
+                        |> Helpers.splitThousands
+                        |> String.join locale.thousandSeparator
 
-{-| Format a integer number as a pretty string:
+                EQ ->
+                    "0"
 
-    >>> formatInt { decimals = 1, thousandSeparator = ",", decimalSeparator = "." } 0
-    "0"
-
-    >>> formatInt (Locale 1 " " ".") 1234567890
-    "1 234 567 890"
-
-    >>> formatInt (Locale 10 "," ".") -123456
-    "−123,456"
-
--}
-formatInt : Locale -> Int -> String
-formatInt locale num =
-    case compare num 0 of
-        LT ->
-            formatInt locale (-num) |> String.cons '−'
-
-        EQ ->
-            "0"
-
-        GT ->
-            splitThousands num |> String.join locale.thousandSeparator
-
-
-{-| The separator, or ""
-
-    >> separator (Locale 10 "," ".")
-    "."
-
-    >> separator (Locale 0 "," ".")
-    ""
--}
-separator : Locale -> String
-separator locale =
-    if locale.decimals == 0 then
-        ""
-    else
-        locale.decimalSeparator
+                LT ->
+                    -truncated
+                        |> toFloat
+                        |> format { locale | decimals = 0 }
+                        |> String.cons '−'
+    in
+        if locale.decimals == 0 then
+            integers
+        else
+            String.concat
+                [ integers
+                , locale.decimalSeparator
+                , Helpers.decimals locale.decimals num
+                ]
