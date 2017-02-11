@@ -20,6 +20,6 @@ guaranted to be correct.
 
 #### launch tests
 ```console
-$ npm install
-$ npm test
+$ yarn install
+$ yarn test
 ```
