@@ -1,31 +1,9 @@
 {
   "name": "elm-format-number",
   "version": "0.0.0",
-  "description": "Format numbers as pretty strings",
-  "main": "index.js",
-  "directories": {
-    "test": "tests"
-  },
   "scripts": {
     "test": "elm-doc-test && elm-test init && elm-test tests/Doc/Main.elm"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lovasoa/elm-format-number.git"
-  },
-  "keywords": [
-    "format",
-    "elm",
-    "number",
-    "int",
-    "float"
-  ],
-  "author": "",
-  "license": "BSD-3-Clause",
-  "bugs": {
-    "url": "https://github.com/lovasoa/elm-format-number/issues"
-  },
-  "homepage": "https://github.com/lovasoa/elm-format-number#readme",
   "devDependencies": {
     "elm": "^0.18.0",
     "elm-doc-test": "^2.2.3",
