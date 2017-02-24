@@ -1,5 +1,5 @@
 {
-    "version": "4.0.0",
+    "version": "3.0.0",
     "summary": "Format numbers as pretty strings",
     "repository": "https://github.com/cuducos/elm-format-number.git",
     "license": "BSD3",
@@ -8,7 +8,7 @@
     ],
     "exposed-modules": [
         "FormatNumber",
-        "Locales"
+        "FormatNumber.Locales"
     ],
     "dependencies": {
         "elm-lang/core": "5.0.0 <= v < 6.0.0"
