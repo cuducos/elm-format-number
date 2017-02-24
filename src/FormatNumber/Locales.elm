@@ -1,4 +1,4 @@
-module Locales exposing (..)
+module FormatNumber.Locales exposing (..)
 
 {-|
 

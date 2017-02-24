@@ -5,7 +5,7 @@ This simple [Elm](http://elm-lang.com) package formats `float` numbers as pretty
 
 ```elm
 import FormatNumber exposing (format)
-import Locales exposing (spanishLocale)
+import FormatNumber.Locales exposing (spanishLocale)
 
 format spanishLocale (pi * 1000)  -- "3.141,59"
 ```
