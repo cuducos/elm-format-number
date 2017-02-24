@@ -9,11 +9,11 @@ separators and diffetent decimal separator.
 
 ## What about `Int` numbers?
 
-    >>> import Locales exposing (usLocale)
+    >>> import FormatNumber.Locales exposing (usLocale)
     >>> format usLocale (toFloat 1234)
     "1,234.00"
 
-    >>> import Locales exposing (usLocale)
+    >>> import FormatNumber.Locales exposing (usLocale)
     >>> format { usLocale | decimals = 0 } <| toFloat 1234
     "1,234"
 
@@ -30,7 +30,7 @@ until Elm itself is fixed:
 -}
 
 import Helpers
-import Locales
+import FormatNumber.Locales as Locales
 import String
 
 
@@ -42,51 +42,51 @@ import String
     >>> format { decimals = 2, thousandSeparator = ",", decimalSeparator = "." } 1234.5567
     "1,234.56"
 
-    >>> import Locales exposing (Locale)
+    >>> import FormatNumber.Locales exposing (Locale)
     >>> format (Locale 3 "." ",") -7654.3210
     "−7.654,321"
 
-    >>> import Locales exposing (Locale)
+    >>> import FormatNumber.Locales exposing (Locale)
     >>> format (Locale 1 "," ".") -0.01
     "0.0"
 
-    >>> import Locales exposing (Locale)
+    >>> import FormatNumber.Locales exposing (Locale)
     >>> format (Locale 2 "," ".") 0.01
     "0.01"
 
-    >>> import Locales exposing (Locale)
+    >>> import FormatNumber.Locales exposing (Locale)
     >>> format (Locale 0 "," ".") 123.456
     "123"
 
-    >>> import Locales exposing (Locale)
+    >>> import FormatNumber.Locales exposing (Locale)
     >>> format (Locale 0 "," ".") 1e9
     "1,000,000,000"
 
-    >>> import Locales exposing (Locale)
+    >>> import FormatNumber.Locales exposing (Locale)
     >>> format (Locale 5 "," ".") 1.0
     "1.00000"
 
-    >>> import Locales exposing (usLocale)
+    >>> import FormatNumber.Locales exposing (usLocale)
     >>> format usLocale pi
     "3.14"
 
-    >>> import Locales exposing (frenchLocale)
+    >>> import FormatNumber.Locales exposing (frenchLocale)
     >>> format { frenchLocale | decimals = 4 } pi
     "3,1416"
 
-    >>> import Locales exposing (frenchLocale)
+    >>> import FormatNumber.Locales exposing (frenchLocale)
     >>> format frenchLocale 67295
     "67 295,000"
 
-    >>> import Locales exposing (spanishLocale)
+    >>> import FormatNumber.Locales exposing (spanishLocale)
     >>> format spanishLocale e
     "2,718"
 
-    >>> import Locales exposing (spanishLocale)
+    >>> import FormatNumber.Locales exposing (spanishLocale)
     >>> format spanishLocale 67295
     "67.295,000"
 
-    >>> import Locales exposing (usLocale)
+    >>> import FormatNumber.Locales exposing (usLocale)
     >>> format usLocale 67295
     "67,295.00"
 
