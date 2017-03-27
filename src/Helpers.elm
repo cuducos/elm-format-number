@@ -1,4 +1,4 @@
-module Helpers exposing (decimals, splitThousands)
+module Helpers exposing (decimals, splitThousands, sign)
 
 {-| Module containing helper functions
 
@@ -53,9 +53,50 @@ decimals digits num =
     digits
         |> toFloat
         |> (^) 10
-        |> (*) num
+        |> (*) (abs num)
         |> round
         |> splitThousands
         |> String.concat
         |> String.right digits
         |> String.padLeft digits '0'
+
+
+{-| Returns the sign of a converted number
+
+    >>> sign 1 "1" "0"
+    ""
+
+    >>> sign 0 "0" "0"
+    ""
+
+    >>> sign -1 "1" "0"
+    "-"
+
+    >>> sign 0 "0" "000"
+    ""
+
+    >>> sign -0.01 "0" "0"
+    ""
+
+    >>> sign -0.01 "0" "01"
+    "-"
+-}
+sign : Float -> String -> String -> String
+sign num integers decimals =
+    let
+        isPositive : Bool
+        isPositive =
+            num >= 0
+
+        allZeros : String -> Bool
+        allZeros =
+            String.all (\char -> char == '0')
+
+        onlyZeros : Bool
+        onlyZeros =
+            (allZeros integers) && (allZeros decimals)
+    in
+        if isPositive || onlyZeros then
+            ""
+        else
+            "-"

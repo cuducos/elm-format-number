@@ -44,7 +44,7 @@ import String
 
     >>> import FormatNumber.Locales exposing (Locale)
     >>> format (Locale 3 "." ",") -7654.3210
-    "−7.654,321"
+    "-7.654,321"
 
     >>> import FormatNumber.Locales exposing (Locale)
     >>> format (Locale 1 "," ".") -0.01
@@ -90,6 +90,13 @@ import String
     >>> format usLocale 67295
     "67,295.00"
 
+    >>> import FormatNumber.Locales exposing (spanishLocale)
+    >>> format spanishLocale -0.1
+    "-0,100"
+
+    >>> import FormatNumber.Locales exposing (spanishLocale)
+    >>> format spanishLocale -0.00099
+    "-0,001"
 -}
 format : Locales.Locale -> Float -> String
 format locale num =
@@ -113,13 +120,23 @@ format locale num =
                     -truncated
                         |> toFloat
                         |> format { locale | decimals = 0 }
-                        |> String.cons '−'
+
+        decimals : String
+        decimals =
+            if locale.decimals == 0 then
+                "0"
+            else
+                Helpers.decimals locale.decimals num
     in
         if locale.decimals == 0 then
-            integers
+            String.concat
+                [ Helpers.sign num integers decimals
+                , integers
+                ]
         else
             String.concat
-                [ integers
+                [ Helpers.sign num integers decimals
+                , integers
                 , locale.decimalSeparator
-                , Helpers.decimals locale.decimals num
+                , decimals
                 ]
