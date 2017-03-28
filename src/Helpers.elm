@@ -70,7 +70,7 @@ decimals digits num =
     ""
 
     >>> sign -1 "1" "0"
-    "-"
+    "−"
 
     >>> sign 0 "0" "000"
     ""
@@ -79,7 +79,7 @@ decimals digits num =
     ""
 
     >>> sign -0.01 "0" "01"
-    "-"
+    "−"
 -}
 sign : Float -> String -> String -> String
 sign num integers decimals =
@@ -99,4 +99,4 @@ sign num integers decimals =
         if isPositive || onlyZeros then
             ""
         else
-            "-"
+            "−"
