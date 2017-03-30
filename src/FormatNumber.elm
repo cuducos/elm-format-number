@@ -2,7 +2,7 @@ module FormatNumber exposing (format)
 
 {-| This simple package formats `float` numbers as pretty strings. It is
 flexible enough to deal with different number of decimals, different thousand
-separators and diffetent decimal separator.
+separators and different decimal separator.
 
 @docs format
 
@@ -31,7 +31,7 @@ until Elm itself is fixed:
 
 import Helpers
 import FormatNumber.Locales as Locales
-import String
+import FormatNumber.FormattedNumber as Formatted
 
 
 {-| Format a float number as a pretty string:
@@ -101,42 +101,18 @@ import String
 format : Locales.Locale -> Float -> String
 format locale num =
     let
-        truncated : Int
-        truncated =
-            truncate num
-
         integers : String
         integers =
-            case compare truncated 0 of
-                GT ->
-                    truncated
-                        |> Helpers.splitThousands
-                        |> String.join locale.thousandSeparator
+            Helpers.toSeparatedIntegerString num locale.thousandSeparator
 
-                EQ ->
-                    "0"
-
-                LT ->
-                    -truncated
-                        |> toFloat
-                        |> format { locale | decimals = 0 }
-
-        decimals : String
+        decimals : Maybe String
         decimals =
-            if locale.decimals == 0 then
-                "0"
-            else
-                Helpers.decimals locale.decimals num
+            Helpers.decimals locale.decimals num
+
+        formattedNumber : Formatted.FormattedNumber
+        formattedNumber =
+            Formatted.FormattedNumber num integers decimals Nothing
     in
-        if locale.decimals == 0 then
-            String.concat
-                [ Helpers.sign num integers decimals
-                , integers
-                ]
-        else
-            String.concat
-                [ Helpers.sign num integers decimals
-                , integers
-                , locale.decimalSeparator
-                , decimals
-                ]
+        formattedNumber
+            |> Formatted.addSign
+            |> Formatted.formattedNumberToString locale.decimalSeparator

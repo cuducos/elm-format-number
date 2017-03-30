@@ -1,4 +1,4 @@
-module Helpers exposing (decimals, splitThousands, sign)
+module Helpers exposing (..)
 
 {-| Module containing helper functions
 
@@ -30,73 +30,62 @@ splitThousands num =
 {-| Returns the first n decimal digits:
 
     >>> decimals 2 123.45
-    "45"
+    Just "45"
 
     >>> decimals 1 1.99
-    "0"
+    Just "0"
 
     >>> decimals 2 1.0
-    "00"
+    Just "00"
 
     >>> decimals 3 -1.0001
-    "000"
+    Just "000"
 
     >>> decimals 2 0.01
-    "01"
+    Just "01"
 
     >>> decimals 2 0.10
-    "10"
+    Just "10"
 
 -}
-decimals : Int -> Float -> String
+decimals : Int -> Float -> Maybe String
 decimals digits num =
-    digits
-        |> toFloat
-        |> (^) 10
-        |> (*) (abs num)
-        |> round
-        |> splitThousands
-        |> String.concat
-        |> String.right digits
-        |> String.padLeft digits '0'
+    if digits == 0 then
+        Nothing
+    else
+        digits
+            |> toFloat
+            |> (^) 10
+            |> (*) (abs num)
+            |> round
+            |> splitThousands
+            |> String.concat
+            |> String.right digits
+            |> String.padLeft digits '0'
+            |> Just
 
 
-{-| Returns the sign of a converted number
+{-| Format an `Float` to a positive integer string, separated by input
 
-    >>> sign 1 "1" "0"
-    ""
+    >>> toSeparatedIntegerString 12345 ","
+    "12,345"
 
-    >>> sign 0 "0" "0"
-    ""
+    >>> toSeparatedIntegerString 12 ","
+    "12"
 
-    >>> sign -1 "1" "0"
-    "−"
+    >>> toSeparatedIntegerString -12345 ","
+    "12,345"
 
-    >>> sign 0 "0" "000"
-    ""
+    >>> toSeparatedIntegerString -12 ","
+    "12"
 
-    >>> sign -0.01 "0" "0"
-    ""
-
-    >>> sign -0.01 "0" "01"
-    "−"
+    >>> toSeparatedIntegerString 12345 "."
+    "12.345"
 -}
-sign : Float -> String -> String -> String
-sign num integers decimals =
-    let
-        isPositive : Bool
-        isPositive =
-            num >= 0
-
-        allZeros : String -> Bool
-        allZeros =
-            String.all (\char -> char == '0')
-
-        onlyZeros : Bool
-        onlyZeros =
-            (allZeros integers) && (allZeros decimals)
-    in
-        if isPositive || onlyZeros then
-            ""
-        else
-            "−"
+toSeparatedIntegerString : Float -> String -> String
+toSeparatedIntegerString num thousandSeparator =
+    num
+        |> truncate
+        |> abs
+        |> splitThousands
+        |> String.join thousandSeparator
