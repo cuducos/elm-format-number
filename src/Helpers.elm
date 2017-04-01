@@ -1,38 +1,42 @@
 module Helpers exposing (..)
 
+import Char
+import FormatNumber.Locales exposing (Locale)
+import Round
+
+
 {-| `FormattedNumber` type and constructor.
 -}
-
-
 type alias FormattedNumber =
     { original : Float
-    , integers : String
-    , decimals : String
+    , integers : List String
+    , decimals : Maybe String
+    , prefix : Maybe String
     }
 
 
 {-| Get the sign to prefix formatted number:
 
-    >>> getSign (FormattedNumber 1 "1" "0")
-    ""
+    >>> addPrefix (FormattedNumber 1.2 ["1"] (Just "2") Nothing)
+    FormattedNumber 1.2 ["1"] (Just "2") Nothing
 
-    >>> getSign (FormattedNumber 0 "0" "0")
-    ""
+    >>> addPrefix (FormattedNumber 0 ["0"] Nothing Nothing)
+    FormattedNumber 0 ["0"] Nothing Nothing
 
-    >>> getSign (FormattedNumber -1 "1" "0")
-    "−"
+    >>> addPrefix (FormattedNumber -1 ["1"] (Just "0") Nothing)
+    FormattedNumber -1 ["1"] (Just "0") (Just "−")
 
-    >>> getSign (FormattedNumber 0 "0" "000")
-    ""
+    >>> addPrefix (FormattedNumber 0 ["0"] (Just "000") Nothing)
+    FormattedNumber 0 ["0"] (Just "000") Nothing
 
-    >>> getSign (FormattedNumber -0.01 "0" "0")
-    ""
+    >>> addPrefix (FormattedNumber -0.01 ["0"] (Just "0") Nothing)
+    FormattedNumber -0.01 ["0"] (Just "0") Nothing
 
-    >>> getSign (FormattedNumber -0.01 "0" "01")
-    "−"
+    >>> addPrefix (FormattedNumber -0.01 ["0"] (Just "01") Nothing)
+    FormattedNumber -0.01 ["0"] (Just "01") (Just "−")
 -}
-getSign : FormattedNumber -> String
-getSign formatted =
+addPrefix : FormattedNumber -> FormattedNumber
+addPrefix formatted =
     let
         isPositive : Bool
         isPositive =
@@ -40,119 +44,204 @@ getSign formatted =
 
         onlyZeros : Bool
         onlyZeros =
-            [ formatted.integers, formatted.decimals ]
+            formatted.decimals
+                |> Maybe.withDefault ""
+                |> List.singleton
+                |> List.append formatted.integers
                 |> String.concat
-                |> String.all (\c -> c == '0')
+                |> String.all (\char -> char == '0')
+
+        prefix : Maybe String
+        prefix =
+            if isPositive || onlyZeros then
+                Nothing
+            else
+                Just "−"
     in
-        if isPositive || onlyZeros then
-            ""
-        else
-            "−"
+        { formatted | prefix = prefix }
 
 
-{-| Stringify a `FormattedNumber` using a decimal separator:
-    >>> formatToString "." (FormattedNumber -0.01 "0" "")
-    "0"
+{-| Split a `String` in `List String` grouping by thousands digits:
 
-    >>> formatToString "." (FormattedNumber -1 "1" "")
-    "−1"
-
-    >>> formatToString "." (FormattedNumber -0.01 "0" "01")
-    "−0.01"
--}
-formatToString : String -> FormattedNumber -> String
-formatToString separator formatted =
-    String.concat
-        [ getSign formatted
-        , formatted.integers
-        , if String.isEmpty formatted.decimals then
-            ""
-          else
-            separator ++ formatted.decimals
-        ]
-
-
-{-| Split a `Int` in `List String` grouping by thousands digits:
-
-    >>> splitThousands 12345
+    >>> splitThousands "12345"
     [ "12", "345" ]
 
-    >>> splitThousands 12
+    >>> splitThousands "12"
     [ "12" ]
 
 -}
-splitThousands : Int -> List String
-splitThousands num =
-    if num >= 1000 then
-        [ num % 1000 ]
-            |> List.map toString
-            |> List.map (String.padLeft 3 '0')
-            |> List.append (splitThousands <| num // 1000)
-    else
-        [ toString num ]
+splitThousands : String -> List String
+splitThousands integers =
+    let
+        reversedSplitThousands : String -> List String
+        reversedSplitThousands value =
+            if String.length value > 3 then
+                value
+                    |> String.dropRight 3
+                    |> reversedSplitThousands
+                    |> (::) (String.right 3 value)
+            else
+                [ value ]
+    in
+        integers
+            |> reversedSplitThousands
+            |> List.reverse
 
 
-{-| Format a `Float` to an unsigned string separated by the thousands:
+{-| Given `decimalDigits` parses a `Float` into a `FormattedNumber`:
 
-    >>> integers "," 12345
-    "12,345"
+    >>> parse 3 3.1415
+    { original = 3.1415
+    , integers = ["3"]
+    , decimals = Just "142"
+    , prefix = Nothing
+    }
 
-    >>> integers "," 12
-    "12"
+    >>> parse 3 -3.1415
+    { original = -3.1415
+    , integers = ["3"]
+    , decimals = Just "141"
+    , prefix = Just "−"
+    }
 
-    >>> integers "," -12345
-    "12,345"
+    >>> parse 0 1234567.89
+    { original = 1234567.89
+    , integers = ["1", "234", "568"]
+    , decimals = Nothing
+    , prefix = Nothing
+    }
 
-    >>> integers "," -12
-    "12"
+    >>> parse 0 -1234567.89
+    { original = -1234567.89
+    , integers = ["1", "234", "568"]
+    , decimals = Nothing
+    , prefix = Just "−"
+    }
 
-    >>> integers "." 12345
-    "12.345"
+    >>> parse 1 999.9
+    { original = 999.9
+    , integers = ["999"]
+    , decimals = Just "9"
+    , prefix = Nothing
+    }
+
+    >>> parse 1 -999.9
+    { original = -999.9
+    , integers = ["999"]
+    , decimals = Just "9"
+    , prefix = Just "−"
+    }
+
+    >>> parse 2 0.001
+    { original = 0.001
+    , integers = ["0"]
+    , decimals = Just "00"
+    , prefix = Nothing
+    }
+
+    >>> parse 2 -0.001
+    { original = -0.001
+    , integers = ["0"]
+    , decimals = Just "00"
+    , prefix = Nothing
+    }
+
+    >>> parse 1 ((2 ^ 39) / 100)
+    { original = 5497558138.88
+    , integers = ["5", "497", "558", "138"]
+    , decimals = Just "9"
+    , prefix = Nothing
+    }
+
+    >>> parse 1 ((-2 ^ 39) / 100)
+    { original = -5497558138.88
+    , integers = ["5", "497", "558", "138"]
+    , decimals = Just "9"
+    , prefix = Just "−"
+    }
 -}
-integers : String -> Float -> String
-integers thousandSeparator num =
-    num
-        |> truncate
-        |> abs
-        |> splitThousands
-        |> String.join thousandSeparator
+parse : Int -> Float -> FormattedNumber
+parse decimalDigits original =
+    let
+        parts : List String
+        parts =
+            original
+                |> Round.round decimalDigits
+                |> String.split "."
+
+        integers : List String
+        integers =
+            parts
+                |> List.head
+                |> Maybe.withDefault "0"
+                |> String.filter Char.isDigit
+                |> splitThousands
+
+        decimals : Maybe String
+        decimals =
+            parts
+                |> List.drop 1
+                |> List.head
+    in
+        addPrefix <| FormattedNumber original integers decimals Nothing
 
 
-{-| Returns the first n decimal digits:
+{-| Stringify a `FormattedNumber` using a `Locale`:
 
-    >>> decimals 2 123.45
-    "45"
+    >>> import FormatNumber.Locales exposing (Locale)
+    >>> stringfy (Locale 3 "." ",") (FormattedNumber 3.1415 ["3"] (Just "142") Nothing)
+    "3,142"
 
-    >>> decimals 1 1.99
-    "0"
+    >>> import FormatNumber.Locales exposing (Locale)
+    >>> stringfy (Locale 3 "." ",") (FormattedNumber -3.1415 ["3"] (Just "142") (Just "−"))
+    "−3,142"
 
-    >>> decimals 2 1.0
-    "00"
+    >>> import FormatNumber.Locales exposing (Locale)
+    >>> stringfy (Locale 0 "." ",") (FormattedNumber 1234567.89 ["1", "234", "568"] Nothing Nothing)
+    "1.234.568"
 
-    >>> decimals 3 -1.0001
-    "000"
+    >>> import FormatNumber.Locales exposing (Locale)
+    >>> stringfy (Locale 0 "." ",") (FormattedNumber 1234567.89 ["1", "234", "568"] Nothing (Just "−"))
+    "−1.234.568"
 
-    >>> decimals 2 0.01
-    "01"
+    >>> import FormatNumber.Locales exposing (Locale)
+    >>> stringfy (Locale 1 "." ",") (FormattedNumber 999.9 ["999"] (Just "9") Nothing)
+    "999,9"
 
-    >>> decimals 2 0.10
-    "10"
+    >>> import FormatNumber.Locales exposing (Locale)
+    >>> stringfy (Locale 1 "." ",") (FormattedNumber 999.9 ["999"] (Just "9") (Just "−"))
+    "−999,9"
 
-    >>> decimals 0 3.1415
-    ""
+    >>> import FormatNumber.Locales exposing (Locale)
+    >>> stringfy (Locale 2 "." ",") (FormattedNumber 0.001 ["0"] (Just "00") Nothing)
+    "0,00"
 
+    >>> import FormatNumber.Locales exposing (Locale)
+    >>> stringfy (Locale 2 "." ",") (FormattedNumber 0.001 ["0"] (Just "00") Nothing)
+    "0,00"
+
+    >>> import FormatNumber.Locales exposing (Locale)
+    >>> stringfy (Locale 1 "." ",") (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] (Just "9") Nothing)
+    "5.497.558.138,9"
+
+    >>> import FormatNumber.Locales exposing (Locale)
+    >>> stringfy (Locale 1 "." ",") (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] (Just "9") (Just "−"))
+    "−5.497.558.138,9"
 -}
-decimals : Int -> Float -> String
-decimals digits num =
-    if digits == 0 then
-        ""
-    else
-        digits
-            |> toFloat
-            |> (^) 10
-            |> (*) (abs num)
-            |> round
-            |> splitThousands
-            |> String.concat
-            |> String.right digits
-            |> String.padLeft digits '0'
+stringfy : Locale -> FormattedNumber -> String
+stringfy locale formatted =
+    let
+        decimals : String
+        decimals =
+            case formatted.decimals of
+                Just decimals ->
+                    locale.decimalSeparator ++ decimals
+
+                Nothing ->
+                    ""
+    in
+        String.concat
+            [ Maybe.withDefault "" formatted.prefix
+            , String.join locale.thousandSeparator formatted.integers
+            , decimals
+            ]

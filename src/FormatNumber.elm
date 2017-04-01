@@ -8,6 +8,8 @@ separators and different decimal separator.
 
 ## What about `Int` numbers?
 
+Just convert them to `Float` before passing them to `format`:
+
     >>> import FormatNumber.Locales exposing (usLocale)
     >>> format usLocale (toFloat 1234)
     "1,234.00"
@@ -15,16 +17,6 @@ separators and different decimal separator.
     >>> import FormatNumber.Locales exposing (usLocale)
     >>> format { usLocale | decimals = 0 } <| toFloat 1234
     "1,234"
-
-## Known bugs
-
-There are [known](https://github.com/elm-lang/elm-compiler/issues/264)
-[bugs](https://github.com/elm-lang/elm-compiler/issues/1246) in how Elm handles
-large numbers. This library cannot work with large numbers (over `2 ^ 31`)
-until Elm itself is fixed:
-
-    >>> format usLocale 1e10
-    "1,410,065,408.00"
 
 -}
 
@@ -95,12 +87,15 @@ import FormatNumber.Locales as Locales
     >>> import FormatNumber.Locales exposing (spanishLocale)
     >>> format spanishLocale -0.00099
     "−0,001"
+
+    >>> format usLocale 1e10
+    "10,000,000,000.00"
+
+    >>> format usLocale -1e10
+    "−10,000,000,000.00"
 -}
 format : Locales.Locale -> Float -> String
 format locale num =
-    Helpers.formatToString
-        locale.decimalSeparator
-        { original = num
-        , integers = Helpers.integers locale.thousandSeparator num
-        , decimals = Helpers.decimals locale.decimals num
-        }
+    num
+        |> Helpers.parse locale.decimals
+        |> Helpers.stringfy locale

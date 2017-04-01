@@ -2,7 +2,7 @@
   "name": "elm-format-number",
   "version": "0.0.0",
   "scripts": {
-    "cleanup": "rm -rfv tests/Doc tests/elm-package.json tests/elm-stuff tests/Main.elm tests/Tests.elm",
+    "cleanup": "rm -rfv tests/Doc tests/elm-stuff tests/Main.elm tests/Tests.elm",
     "test": "elm-doc-test && elm-test init && elm-test tests/Doc/Main.elm"
   },
   "devDependencies": {
