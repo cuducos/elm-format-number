@@ -1,4 +1,3 @@
+*.swp
 elm-stuff/
 node_modules/
-
-*.swp
