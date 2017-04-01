@@ -8,93 +8,68 @@ type alias FormattedNumber =
     { original : Float
     , integers : String
     , decimals : String
-    , prefix : Maybe String
     }
 
 
-{-| Adds the sign to a formatted number:
+{-| Get the sign to prefix formatted number:
 
-    >>> addPrefix (FormattedNumber 1 "1" "0" Nothing)
-    FormattedNumber 1 "1" "0" (Just "")
+    >>> getSign (FormattedNumber 1 "1" "0")
+    ""
 
-    >>> addPrefix (FormattedNumber 0 "0" "0" Nothing)
-    FormattedNumber 0 "0" "0" (Just "")
+    >>> getSign (FormattedNumber 0 "0" "0")
+    ""
 
-    >>> addPrefix (FormattedNumber -1 "1" "0" Nothing)
-    FormattedNumber -1 "1" "0" (Just "−")
+    >>> getSign (FormattedNumber -1 "1" "0")
+    "−"
 
-    >>> addPrefix (FormattedNumber 0 "0" "000" Nothing)
-    FormattedNumber 0 "0" "000" (Just "")
+    >>> getSign (FormattedNumber 0 "0" "000")
+    ""
 
-    >>> addPrefix (FormattedNumber -0.01 "0" "0" Nothing)
-    FormattedNumber -0.01 "0" "0" (Just "")
+    >>> getSign (FormattedNumber -0.01 "0" "0")
+    ""
 
-    >>> addPrefix (FormattedNumber -0.01 "0" "01" Nothing)
-    FormattedNumber -0.01 "0" "01" (Just "−")
+    >>> getSign (FormattedNumber -0.01 "0" "01")
+    "−"
 -}
-addPrefix : FormattedNumber -> FormattedNumber
-addPrefix formatted =
-    case formatted.prefix of
-        Just _ ->
-            formatted
+getSign : FormattedNumber -> String
+getSign formatted =
+    let
+        isPositive : Bool
+        isPositive =
+            formatted.original >= 0
 
-        Nothing ->
-            let
-                isPositive : Bool
-                isPositive =
-                    formatted.original >= 0
-
-                onlyZeros : Bool
-                onlyZeros =
-                    [ formatted.integers, formatted.decimals ]
-                        |> String.concat
-                        |> String.all (\c -> c == '0')
-
-                prefix : String
-                prefix =
-                    if isPositive || onlyZeros then
-                        ""
-                    else
-                        "−"
-            in
-                { formatted | prefix = Just prefix }
+        onlyZeros : Bool
+        onlyZeros =
+            [ formatted.integers, formatted.decimals ]
+                |> String.concat
+                |> String.all (\c -> c == '0')
+    in
+        if isPositive || onlyZeros then
+            ""
+        else
+            "−"
 
 
 {-| Stringify a `FormattedNumber` using a decimal separator:
-    >>> formatToString "." (FormattedNumber -0.01 "0" "" Nothing)
+    >>> formatToString "." (FormattedNumber -0.01 "0" "")
     "0"
 
-    >>> formatToString "." (FormattedNumber -1 "1" "" (Just "−"))
+    >>> formatToString "." (FormattedNumber -1 "1" "")
     "−1"
 
-    >>> formatToString "." (FormattedNumber -0.01 "0" "01" (Just ""))
-    "0.01"
-
-    >>> formatToString "." (FormattedNumber -0.01 "0" "01" (Just "−"))
+    >>> formatToString "." (FormattedNumber -0.01 "0" "01")
     "−0.01"
 -}
 formatToString : String -> FormattedNumber -> String
 formatToString separator formatted =
-    let
-        prefix : String
-        prefix =
-            formatted
-                |> addPrefix
-                |> .prefix
-                |> Maybe.withDefault ""
-
-        decimals : String
-        decimals =
-            if String.isEmpty formatted.decimals then
-                ""
-            else
-                separator ++ formatted.decimals
-    in
-        String.concat
-            [ prefix
-            , formatted.integers
-            , decimals
-            ]
+    String.concat
+        [ getSign formatted
+        , formatted.integers
+        , if String.isEmpty formatted.decimals then
+            ""
+          else
+            separator ++ formatted.decimals
+        ]
 
 
 {-| Split a `Int` in `List String` grouping by thousands digits:

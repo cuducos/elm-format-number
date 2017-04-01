@@ -103,5 +103,4 @@ format locale num =
         { original = num
         , integers = Helpers.integers locale.thousandSeparator num
         , decimals = Helpers.decimals locale.decimals num
-        , prefix = Nothing
         }
