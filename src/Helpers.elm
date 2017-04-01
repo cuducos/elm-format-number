@@ -1,10 +1,100 @@
 module Helpers exposing (..)
 
-{-| Module containing helper functions
-
-@docs splitThousands, decimals
-
+{-| `FormattedNumber` type and constructor.
 -}
+
+
+type alias FormattedNumber =
+    { original : Float
+    , integers : String
+    , decimals : String
+    , prefix : Maybe String
+    }
+
+
+{-| Adds the sign to a formatted number:
+
+    >>> addPrefix (FormattedNumber 1 "1" "0" Nothing)
+    FormattedNumber 1 "1" "0" (Just "")
+
+    >>> addPrefix (FormattedNumber 0 "0" "0" Nothing)
+    FormattedNumber 0 "0" "0" (Just "")
+
+    >>> addPrefix (FormattedNumber -1 "1" "0" Nothing)
+    FormattedNumber -1 "1" "0" (Just "−")
+
+    >>> addPrefix (FormattedNumber 0 "0" "000" Nothing)
+    FormattedNumber 0 "0" "000" (Just "")
+
+    >>> addPrefix (FormattedNumber -0.01 "0" "0" Nothing)
+    FormattedNumber -0.01 "0" "0" (Just "")
+
+    >>> addPrefix (FormattedNumber -0.01 "0" "01" Nothing)
+    FormattedNumber -0.01 "0" "01" (Just "−")
+-}
+addPrefix : FormattedNumber -> FormattedNumber
+addPrefix formatted =
+    case formatted.prefix of
+        Just _ ->
+            formatted
+
+        Nothing ->
+            let
+                isPositive : Bool
+                isPositive =
+                    formatted.original >= 0
+
+                onlyZeros : Bool
+                onlyZeros =
+                    [ formatted.integers, formatted.decimals ]
+                        |> String.concat
+                        |> String.all (\c -> c == '0')
+
+                prefix : String
+                prefix =
+                    if isPositive || onlyZeros then
+                        ""
+                    else
+                        "−"
+            in
+                { formatted | prefix = Just prefix }
+
+
+{-| Stringify a `FormattedNumber` using a decimal separator:
+    >>> formatToString "." (FormattedNumber -0.01 "0" "" Nothing)
+    "0"
+
+    >>> formatToString "." (FormattedNumber -1 "1" "" (Just "−"))
+    "−1"
+
+    >>> formatToString "." (FormattedNumber -0.01 "0" "01" (Just ""))
+    "0.01"
+
+    >>> formatToString "." (FormattedNumber -0.01 "0" "01" (Just "−"))
+    "−0.01"
+-}
+formatToString : String -> FormattedNumber -> String
+formatToString separator formatted =
+    let
+        prefix : String
+        prefix =
+            formatted
+                |> addPrefix
+                |> .prefix
+                |> Maybe.withDefault ""
+
+        decimals : String
+        decimals =
+            if String.isEmpty formatted.decimals then
+                ""
+            else
+                separator ++ formatted.decimals
+    in
+        String.concat
+            [ prefix
+            , formatted.integers
+            , decimals
+            ]
 
 
 {-| Split a `Int` in `List String` grouping by thousands digits:
@@ -27,31 +117,60 @@ splitThousands num =
         [ toString num ]
 
 
+{-| Format a `Float` to an unsigned string separated by the thousands:
+
+    >>> integers "," 12345
+    "12,345"
+
+    >>> integers "," 12
+    "12"
+
+    >>> integers "," -12345
+    "12,345"
+
+    >>> integers "," -12
+    "12"
+
+    >>> integers "." 12345
+    "12.345"
+-}
+integers : String -> Float -> String
+integers thousandSeparator num =
+    num
+        |> truncate
+        |> abs
+        |> splitThousands
+        |> String.join thousandSeparator
+
+
 {-| Returns the first n decimal digits:
 
     >>> decimals 2 123.45
-    Just "45"
+    "45"
 
     >>> decimals 1 1.99
-    Just "0"
+    "0"
 
     >>> decimals 2 1.0
-    Just "00"
+    "00"
 
     >>> decimals 3 -1.0001
-    Just "000"
+    "000"
 
     >>> decimals 2 0.01
-    Just "01"
+    "01"
 
     >>> decimals 2 0.10
-    Just "10"
+    "10"
+
+    >>> decimals 0 3.1415
+    ""
 
 -}
-decimals : Int -> Float -> Maybe String
+decimals : Int -> Float -> String
 decimals digits num =
     if digits == 0 then
-        Nothing
+        ""
     else
         digits
             |> toFloat
@@ -62,30 +181,3 @@ decimals digits num =
             |> String.concat
             |> String.right digits
             |> String.padLeft digits '0'
-            |> Just
-
-
-{-| Format an `Float` to a positive integer string, separated by input
-
-    >>> toSeparatedIntegerString 12345 ","
-    "12,345"
-
-    >>> toSeparatedIntegerString 12 ","
-    "12"
-
-    >>> toSeparatedIntegerString -12345 ","
-    "12,345"
-
-    >>> toSeparatedIntegerString -12 ","
-    "12"
-
-    >>> toSeparatedIntegerString 12345 "."
-    "12.345"
--}
-toSeparatedIntegerString : Float -> String -> String
-toSeparatedIntegerString num thousandSeparator =
-    num
-        |> truncate
-        |> abs
-        |> splitThousands
-        |> String.join thousandSeparator

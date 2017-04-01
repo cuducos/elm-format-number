@@ -1,11 +1,10 @@
 module FormatNumber exposing (format)
 
-{-| This simple package formats `float` numbers as pretty strings. It is
+{-| This simple package formats `Float` numbers as pretty strings. It is
 flexible enough to deal with different number of decimals, different thousand
 separators and different decimal separator.
 
 @docs format
-
 
 ## What about `Int` numbers?
 
@@ -31,7 +30,6 @@ until Elm itself is fixed:
 
 import Helpers
 import FormatNumber.Locales as Locales
-import FormatNumber.FormattedNumber as Formatted
 
 
 {-| Format a float number as a pretty string:
@@ -100,19 +98,10 @@ import FormatNumber.FormattedNumber as Formatted
 -}
 format : Locales.Locale -> Float -> String
 format locale num =
-    let
-        integers : String
-        integers =
-            Helpers.toSeparatedIntegerString num locale.thousandSeparator
-
-        decimals : Maybe String
-        decimals =
-            Helpers.decimals locale.decimals num
-
-        formattedNumber : Formatted.FormattedNumber
-        formattedNumber =
-            Formatted.FormattedNumber num integers decimals Nothing
-    in
-        formattedNumber
-            |> Formatted.addSign
-            |> Formatted.formattedNumberToString locale.decimalSeparator
+    Helpers.formatToString
+        locale.decimalSeparator
+        { original = num
+        , integers = Helpers.integers locale.thousandSeparator num
+        , decimals = Helpers.decimals locale.decimals num
+        , prefix = Nothing
+        }

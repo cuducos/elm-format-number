@@ -1,4 +1,4 @@
 {
   "root": "../src",
-  "tests": [ "FormatNumber", "Helpers", "FormatNumber.FormattedNumber"]
+  "tests": [ "FormatNumber", "Helpers" ]
 }
