@@ -33,7 +33,7 @@ frenchLocale =
     Locale 3 "\x202F" ","
 
 
-{-| Locale used in Spain, Italy and Norway. It has 2 decimals digits, uses a
+{-| Locale used in Spain, Italy and Norway. It has 3 decimals digits, uses a
 `.` as thousand separator and a `,` as decimal separator.
 -}
 spanishLocale : Locale
