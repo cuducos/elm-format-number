@@ -2,8 +2,10 @@
   "name": "elm-format-number",
   "version": "0.0.0",
   "scripts": {
-    "pretest": "rm -rf tests/Doc tests/elm-stuff tests/Main.elm tests/Tests.elm",
-    "test": "elm-verify-examples && elm-test init && rm tests/Example.elm && elm-test"
+    "cleanup": "rm -rf tests/Doc tests/elm-stuff tests/Main.elm tests/Tests.elm",
+    "pretest": "elm-verify-examples && elm-test init && rm tests/Example.elm",
+    "test": "elm-test",
+    "posttest": "git checkout -- tests/elm-package.json"
   },
   "devDependencies": {
     "elm": "^0.18.0",
