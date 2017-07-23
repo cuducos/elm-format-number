@@ -1,5 +1,4 @@
-# Elm Format Number [![Build Status](https://travis-ci.org/cuducos/elm-format-number.svg?branch=master)](https://travis-ci.org/cuducos/elm-format-number)
-
+# Elm Format Number [![Build Status](https://circleci.com/gh/cuducos/elm-format-number.svg?style=shield)](https://circleci.com/gh/cuducos/elm-format-number)
 
 This simple [Elm](http://elm-lang.com) package formats `float` numbers as pretty strings:
 
