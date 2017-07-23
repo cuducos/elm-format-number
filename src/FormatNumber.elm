@@ -26,34 +26,34 @@ import FormatNumber.Locales as Locales
 
 {-| Format a float number as a pretty string:
 
-    >>> format { decimals = 2, thousandSeparator = ".", decimalSeparator = "," } 123456.789
+    >>> format { decimals = 2, thousandSeparator = ".", decimalSeparator = ",", minusSign = "−" } 123456.789
     "123.456,79"
 
-    >>> format { decimals = 2, thousandSeparator = ",", decimalSeparator = "." } 1234.5567
+    >>> format { decimals = 2, thousandSeparator = ",", decimalSeparator = ".", minusSign = "−"  } 1234.5567
     "1,234.56"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> format (Locale 3 "." ",") -7654.3210
+    >>> format (Locale 3 "." "," "−") -7654.3210
     "−7.654,321"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> format (Locale 1 "," ".") -0.01
+    >>> format (Locale 1 "," "." "−") -0.01
     "0.0"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> format (Locale 2 "," ".") 0.01
+    >>> format (Locale 2 "," "." "−") 0.01
     "0.01"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> format (Locale 0 "," ".") 123.456
+    >>> format (Locale 0 "," "." "−") 123.456
     "123"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> format (Locale 0 "," ".") 1e9
+    >>> format (Locale 0 "," "." "−") 1e9
     "1,000,000,000"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> format (Locale 5 "," ".") 1.0
+    >>> format (Locale 5 "," "." "−") 1.0
     "1.00000"
 
     >>> import FormatNumber.Locales exposing (usLocale)
@@ -93,9 +93,11 @@ import FormatNumber.Locales as Locales
 
     >>> format usLocale -1e10
     "−10,000,000,000.00"
+
+    >>> format { usLocale | minusSign = "-" } -1.0
+    "-1.00"
+
 -}
 format : Locales.Locale -> Float -> String
 format locale num =
-    num
-        |> Helpers.parse locale.decimals
-        |> Helpers.stringfy locale
+    Helpers.stringfy <| Helpers.parse locale num

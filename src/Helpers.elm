@@ -12,28 +12,35 @@ type alias FormattedNumber =
     , integers : List String
     , decimals : Maybe String
     , prefix : Maybe String
+    , locale : Locale
     }
 
 
-{-| Get the sign to prefix formatted number:
+{-| Get the sign to prefix a `FormattedNumber`:
 
-    >>> addPrefix (FormattedNumber 1.2 ["1"] (Just "2") Nothing)
-    FormattedNumber 1.2 ["1"] (Just "2") Nothing
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> addPrefix (FormattedNumber 1.2 ["1"] (Just "2") Nothing usLocale)
+    FormattedNumber 1.2 ["1"] (Just "2") Nothing usLocale
 
-    >>> addPrefix (FormattedNumber 0 ["0"] Nothing Nothing)
-    FormattedNumber 0 ["0"] Nothing Nothing
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> addPrefix (FormattedNumber 0 ["0"] Nothing Nothing usLocale)
+    FormattedNumber 0 ["0"] Nothing Nothing usLocale
 
-    >>> addPrefix (FormattedNumber -1 ["1"] (Just "0") Nothing)
-    FormattedNumber -1 ["1"] (Just "0") (Just "−")
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> addPrefix (FormattedNumber -1 ["1"] (Just "0") Nothing usLocale)
+    FormattedNumber -1 ["1"] (Just "0") (Just "−") usLocale
 
-    >>> addPrefix (FormattedNumber 0 ["0"] (Just "000") Nothing)
-    FormattedNumber 0 ["0"] (Just "000") Nothing
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> addPrefix (FormattedNumber 0 ["0"] (Just "000") Nothing usLocale)
+    FormattedNumber 0 ["0"] (Just "000") Nothing usLocale
 
-    >>> addPrefix (FormattedNumber -0.01 ["0"] (Just "0") Nothing)
-    FormattedNumber -0.01 ["0"] (Just "0") Nothing
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> addPrefix (FormattedNumber -0.01 ["0"] (Just "0") Nothing usLocale)
+    FormattedNumber -0.01 ["0"] (Just "0") Nothing usLocale
 
-    >>> addPrefix (FormattedNumber -0.01 ["0"] (Just "01") Nothing)
-    FormattedNumber -0.01 ["0"] (Just "01") (Just "−")
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> addPrefix (FormattedNumber -0.01 ["0"] (Just "01") Nothing usLocale)
+    FormattedNumber -0.01 ["0"] (Just "01") (Just "−") usLocale
 -}
 addPrefix : FormattedNumber -> FormattedNumber
 addPrefix formatted =
@@ -56,7 +63,7 @@ addPrefix formatted =
             if isPositive || onlyZeros then
                 Nothing
             else
-                Just "−"
+                Just formatted.locale.minusSign
     in
         { formatted | prefix = prefix }
 
@@ -88,85 +95,105 @@ splitThousands integers =
             |> List.reverse
 
 
-{-| Given `decimalDigits` parses a `Float` into a `FormattedNumber`:
+{-| Given a `Locale` parses a `Float` into a `FormattedNumber`:
 
-    >>> parse 3 3.1415
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> parse { usLocale | decimals = 3 } 3.1415
     { original = 3.1415
     , integers = ["3"]
     , decimals = Just "142"
     , prefix = Nothing
+    , locale = { usLocale | decimals = 3 }
     }
 
-    >>> parse 3 -3.1415
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> parse { usLocale | decimals = 3 } -3.1415
     { original = -3.1415
     , integers = ["3"]
     , decimals = Just "141"
     , prefix = Just "−"
+    , locale = { usLocale | decimals = 3 }
     }
 
-    >>> parse 0 1234567.89
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> parse { usLocale | decimals = 0 } 1234567.89
     { original = 1234567.89
     , integers = ["1", "234", "568"]
     , decimals = Nothing
     , prefix = Nothing
+    , locale = { usLocale | decimals = 0 }
     }
 
-    >>> parse 0 -1234567.89
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> parse { usLocale | decimals = 0 } -1234567.89
     { original = -1234567.89
     , integers = ["1", "234", "568"]
     , decimals = Nothing
     , prefix = Just "−"
+    , locale = { usLocale | decimals = 0 }
     }
 
-    >>> parse 1 999.9
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> parse { usLocale | decimals = 1 } 999.9
     { original = 999.9
     , integers = ["999"]
     , decimals = Just "9"
     , prefix = Nothing
+    , locale = { usLocale | decimals = 1 }
     }
 
-    >>> parse 1 -999.9
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> parse { usLocale | decimals = 1 } -999.9
     { original = -999.9
     , integers = ["999"]
     , decimals = Just "9"
     , prefix = Just "−"
+    , locale = { usLocale | decimals = 1 }
     }
 
-    >>> parse 2 0.001
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> parse usLocale 0.001
     { original = 0.001
     , integers = ["0"]
     , decimals = Just "00"
     , prefix = Nothing
+    , locale = usLocale
     }
 
-    >>> parse 2 -0.001
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> parse usLocale -0.001
     { original = -0.001
     , integers = ["0"]
     , decimals = Just "00"
     , prefix = Nothing
+    , locale = usLocale
     }
 
-    >>> parse 1 ((2 ^ 39) / 100)
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> parse { usLocale | decimals = 1 } ((2 ^ 39) / 100)
     { original = 5497558138.88
     , integers = ["5", "497", "558", "138"]
     , decimals = Just "9"
     , prefix = Nothing
+    , locale = { usLocale | decimals = 1 }
     }
 
-    >>> parse 1 ((-2 ^ 39) / 100)
+    >>> import FormatNumber.Locales exposing (usLocale)
+    >>> parse { usLocale | decimals = 1 } ((-2 ^ 39) / 100)
     { original = -5497558138.88
     , integers = ["5", "497", "558", "138"]
     , decimals = Just "9"
     , prefix = Just "−"
+    , locale = { usLocale | decimals = 1 }
     }
 -}
-parse : Int -> Float -> FormattedNumber
-parse decimalDigits original =
+parse : Locale -> Float -> FormattedNumber
+parse locale original =
     let
         parts : List String
         parts =
             original
-                |> Round.round decimalDigits
+                |> Round.round locale.decimals
                 |> String.split "."
 
         integers : List String
@@ -183,65 +210,65 @@ parse decimalDigits original =
                 |> List.drop 1
                 |> List.head
     in
-        addPrefix <| FormattedNumber original integers decimals Nothing
+        addPrefix <| FormattedNumber original integers decimals Nothing locale
 
 
-{-| Stringify a `FormattedNumber` using a `Locale`:
+{-| Stringify a `FormattedNumber`:
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> stringfy (Locale 3 "." ",") (FormattedNumber 3.1415 ["3"] (Just "142") Nothing)
+    >>> stringfy (FormattedNumber 3.1415 ["3"] (Just "142") Nothing (Locale 3 "." "," "−"))
     "3,142"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> stringfy (Locale 3 "." ",") (FormattedNumber -3.1415 ["3"] (Just "142") (Just "−"))
+    >>> stringfy (FormattedNumber -3.1415 ["3"] (Just "142") (Just "−") (Locale 3 "." "," "−"))
     "−3,142"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> stringfy (Locale 0 "." ",") (FormattedNumber 1234567.89 ["1", "234", "568"] Nothing Nothing)
+    >>> stringfy (FormattedNumber 1234567.89 ["1", "234", "568"] Nothing Nothing (Locale 0 "." "," "−"))
     "1.234.568"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> stringfy (Locale 0 "." ",") (FormattedNumber 1234567.89 ["1", "234", "568"] Nothing (Just "−"))
+    >>> stringfy (FormattedNumber 1234567.89 ["1", "234", "568"] Nothing (Just "−") (Locale 0 "." "," "−"))
     "−1.234.568"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> stringfy (Locale 1 "." ",") (FormattedNumber 999.9 ["999"] (Just "9") Nothing)
+    >>> stringfy (FormattedNumber 999.9 ["999"] (Just "9") Nothing (Locale 1 "." "," "−"))
     "999,9"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> stringfy (Locale 1 "." ",") (FormattedNumber 999.9 ["999"] (Just "9") (Just "−"))
+    >>> stringfy (FormattedNumber 999.9 ["999"] (Just "9") (Just "−") (Locale 1 "." "," "−"))
     "−999,9"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> stringfy (Locale 2 "." ",") (FormattedNumber 0.001 ["0"] (Just "00") Nothing)
+    >>> stringfy (FormattedNumber 0.001 ["0"] (Just "00") Nothing (Locale 2 "." "," "−"))
     "0,00"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> stringfy (Locale 2 "." ",") (FormattedNumber 0.001 ["0"] (Just "00") Nothing)
+    >>> stringfy (FormattedNumber 0.001 ["0"] (Just "00") Nothing (Locale 2 "." "," "−"))
     "0,00"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> stringfy (Locale 1 "." ",") (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] (Just "9") Nothing)
+    >>> stringfy (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] (Just "9") Nothing (Locale 1 "." "," "−"))
     "5.497.558.138,9"
 
     >>> import FormatNumber.Locales exposing (Locale)
-    >>> stringfy (Locale 1 "." ",") (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] (Just "9") (Just "−"))
+    >>> stringfy (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] (Just "9") (Just "−") (Locale 1 "." "," "−"))
     "−5.497.558.138,9"
 -}
-stringfy : Locale -> FormattedNumber -> String
-stringfy locale formatted =
+stringfy : FormattedNumber -> String
+stringfy formatted =
     let
         decimals : String
         decimals =
             case formatted.decimals of
                 Just decimals ->
-                    locale.decimalSeparator ++ decimals
+                    formatted.locale.decimalSeparator ++ decimals
 
                 Nothing ->
                     ""
     in
         String.concat
             [ Maybe.withDefault "" formatted.prefix
-            , String.join locale.thousandSeparator formatted.integers
+            , String.join formatted.locale.thousandSeparator formatted.integers
             , decimals
             ]
