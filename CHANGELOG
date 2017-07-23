@@ -1,16 +1,27 @@
 # Changelog
 
-**4.0.1**
+**5.0.1** (Jul 23, 2017)
+  * Update documentation
+
+**5.0.0** (Jul 23, 2017)
+  * Support for customization of the negative representation
+  
+**4.0.2** (Jun 4, 2017)
+  * Update documentation
+
+**4.0.1** (Apr 1, 2017)
   * Fix bug with negative numbers (thanks @pedrocalderon)
   * Fix bug large numbers (thanks @chancyk)
 
-**4.0.0**
+**4.0.0** (Feb 24, 2017)
   * `Locale` now lives inside `FormatNumber` module to avoid conflicts (thanks @peteygao)
 
-**3.0.0**
+**3.0.0** (Feb 11, 2017)
   * No more chance to format `Int`: one `format` to rule them all (thanks @rogeriochaves)
   * Useful `Locale`s included (thanks @lovasoa)
   * Minor fixes
 
-**2.0.0**
+**2.0.0** (Dec 27, 2016)
   * Introduce `Locale` type alias
+
+**1.0.0** (Dec 17, 2016)
