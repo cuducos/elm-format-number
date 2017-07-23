@@ -19,10 +19,15 @@ import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (Locale, usLocale)
 
 sharesLocale : Locale
-sharesLocale = { usLocale | decimals = 3 }
+sharesLocale =
+    { usLocale
+        | decimals = 3
+        , negativePrefix = "("
+        , negativeSuffix = ")"
+    }
 
-format usLocale pi -- "3.14"
-format sharesLocale pi -- "3.142"
+format usLocale -pi -- "−3.14"
+format sharesLocale -pi -- "(3.142)"
 ```
 
 The API is further documented in [package.elm-lang.org](http://package.elm-lang.org/packages/cuducos/elm-format-number/latest/FormatNumber).
