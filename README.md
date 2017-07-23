@@ -5,41 +5,34 @@ This simple [Elm](http://elm-lang.com) package formats `float` numbers as pretty
 
 ```elm
 import FormatNumber exposing (format)
-import FormatNumber.Locales exposing (spanishLocale)
+import FormatNumber.Locales exposing (spanishLocale, usLocale)
 
+format usLocale (pi * 1000)  -- "3,141.59"
 format spanishLocale (pi * 1000)  -- "3.141,59"
 ```
 
-It is flexible enough to deal with different number of decimals, different thousand separators and diffetent decimal separator. It has a couple os predefined `Locale` but you can edit them or create your own:
+It is flexible enough to deal with different number of decimals, different thousand separators, diffetent decimal separator, and different ways to represent negative numbers — all that is possible using `Locale`s. 
+
+Elm Format Number has a couple os predefined `Locale`s and it is easy to customize your own:
 
 ```elm
 import FormatNumber exposing (format)
-import FormatNumber.Locales exposing (Locale)
+import FormatNumber.Locales exposing (Locale, usLocale)
 
-myLocale : Locale
-myLocale =
-    { decimals = 4
-    , thousandSeparator = " "
-    , decimalSeparator = "."
-    }
-    
 sharesLocale : Locale
-sharesLocale = { myLocale | decimals = 3 }
+sharesLocale = { usLocale | decimals = 3 }
 
-format myLocale (pi * 1000) -- "3 141.5926"
-format sharesLocale (pi * 1000) -- "3 141.593"
-
-
-
+format usLocale pi -- "3.14"
+format sharesLocale pi -- "3.142"
 ```
 
 The API is further documented in [package.elm-lang.org](http://package.elm-lang.org/packages/cuducos/elm-format-number/latest/FormatNumber).
 
 ## Tests
 
-This package uses [elm-doc-test](https://www.npmjs.com/package/elm-doc-test), all the exemples in the documentation are automatically tested:
+This package uses [elm-verify-examples](https://www.npmjs.com/package/elm-doc-test), all the exemples in the documentation are automatically tested:
 
 ```console
-$ yarn install
-$ yarn test
+$ npm install
+$ npm test
 ```

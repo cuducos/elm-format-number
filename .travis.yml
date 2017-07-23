@@ -1,8 +1,9 @@
 language: node_js
 node_js:
-  - "6"
+  - "8"
 
 before_install:
+  - npm i
   - |
     if [ ! -d sysconfcpus/bin ];
     then
@@ -14,4 +15,4 @@ before_install:
     fi
 
 script:
-  - $TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 yarn test
+  - $TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 npm test
