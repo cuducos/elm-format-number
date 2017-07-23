@@ -21,7 +21,8 @@ type alias Locale =
     { decimals : Int
     , thousandSeparator : String
     , decimalSeparator : String
-    , minusSign : String
+    , negativePrefix : String
+    , negativeSuffix : String
     }
 
 
@@ -31,7 +32,7 @@ separator. It uses a minus sign (not a hyphen).
 -}
 frenchLocale : Locale
 frenchLocale =
-    Locale 3 "\x202F" "," "−"
+    Locale 3 "\x202F" "," "−" ""
 
 
 {-| Locale used in Spain, Italy and Norway. It has 3 decimals digits, uses a
@@ -40,7 +41,7 @@ frenchLocale =
 -}
 spanishLocale : Locale
 spanishLocale =
-    Locale 3 "." "," "−"
+    Locale 3 "." "," "−" ""
 
 
 {-| Locale used in the United States, Great Britain and Thailand. It has 2
@@ -49,4 +50,4 @@ separator. It uses a minus sign (not a hyphen).
 -}
 usLocale : Locale
 usLocale =
-    Locale 2 "," "." "−"
+    Locale 2 "," "." "−" ""

@@ -8,39 +8,40 @@ import Round
 {-| `FormattedNumber` type and constructor.
 -}
 type alias FormattedNumber =
-    { original : Float
+    { locale : Locale
+    , original : Float
     , integers : List String
     , decimals : Maybe String
-    , prefix : Maybe String
-    , locale : Locale
+    , negativePrefix : Maybe String
+    , negativeSuffix : Maybe String
     }
 
 
-{-| Get the sign to prefix a `FormattedNumber`:
+{-| Identify if the formatted version of a number is negative:
 
     import FormatNumber.Locales exposing (usLocale)
 
-    addPrefix (FormattedNumber 1.2 ["1"] (Just "2") Nothing usLocale)
-    --> FormattedNumber 1.2 ["1"] (Just "2") Nothing usLocale
+    isNegative (FormattedNumber usLocale 1.2 ["1"] (Just "2") Nothing Nothing)
+    --> False
 
-    addPrefix (FormattedNumber 0 ["0"] Nothing Nothing usLocale)
-    --> FormattedNumber 0 ["0"] Nothing Nothing usLocale
+    isNegative (FormattedNumber usLocale 0 ["0"] Nothing Nothing Nothing)
+    --> False
 
-    addPrefix (FormattedNumber -1 ["1"] (Just "0") Nothing usLocale)
-    --> FormattedNumber -1 ["1"] (Just "0") (Just "−") usLocale
+    isNegative (FormattedNumber usLocale -1 ["1"] (Just "0") Nothing Nothing)
+    --> True
 
-    addPrefix (FormattedNumber 0 ["0"] (Just "000") Nothing usLocale)
-    --> FormattedNumber 0 ["0"] (Just "000") Nothing usLocale
+    isNegative (FormattedNumber usLocale 0 ["0"] (Just "000") Nothing Nothing)
+    --> False
 
-    addPrefix (FormattedNumber -0.01 ["0"] (Just "0") Nothing usLocale)
-    --> FormattedNumber -0.01 ["0"] (Just "0") Nothing usLocale
+    isNegative (FormattedNumber usLocale -0.01 ["0"] (Just "0") Nothing Nothing)
+    --> False
 
-    addPrefix (FormattedNumber -0.01 ["0"] (Just "01") Nothing usLocale)
-    --> FormattedNumber -0.01 ["0"] (Just "01") (Just "−") usLocale
+    isNegative (FormattedNumber usLocale -0.01 ["0"] (Just "01") Nothing Nothing)
+    --> True
 
 -}
-addPrefix : FormattedNumber -> FormattedNumber
-addPrefix formatted =
+isNegative : FormattedNumber -> Bool
+isNegative formatted =
     let
         isPositive : Bool
         isPositive =
@@ -54,15 +55,8 @@ addPrefix formatted =
                 |> List.append formatted.integers
                 |> String.concat
                 |> String.all (\char -> char == '0')
-
-        prefix : Maybe String
-        prefix =
-            if isPositive || onlyZeros then
-                Nothing
-            else
-                Just formatted.locale.minusSign
     in
-        { formatted | prefix = prefix }
+        not (isPositive || onlyZeros)
 
 
 {-| Split a `String` in `List String` grouping by thousands digits:
@@ -95,85 +89,94 @@ splitThousands integers =
     import FormatNumber.Locales exposing (usLocale)
 
     parse { usLocale | decimals = 3 } 3.1415
-    --> { original = 3.1415
+    --> { locale = { usLocale | decimals = 3 }
+    --> , original = 3.1415
     --> , integers = ["3"]
     --> , decimals = Just "142"
-    --> , prefix = Nothing
-    --> , locale = { usLocale | decimals = 3 }
+    --> , negativePrefix = Nothing
+    --> , negativeSuffix = Nothing
     --> }
 
     parse { usLocale | decimals = 3 } -3.1415
-    --> { original = -3.1415
+    --> { locale = { usLocale | decimals = 3 }
+    --> , original = -3.1415
     --> , integers = ["3"]
     --> , decimals = Just "141"
-    --> , prefix = Just "−"
-    --> , locale = { usLocale | decimals = 3 }
+    --> , negativePrefix = Just "−"
+    --> , negativeSuffix = Just ""
     --> }
 
     parse { usLocale | decimals = 0 } 1234567.89
-    --> { original = 1234567.89
+    --> { locale = { usLocale | decimals = 0 }
+    --> , original = 1234567.89
     --> , integers = ["1", "234", "568"]
     --> , decimals = Nothing
-    --> , prefix = Nothing
-    --> , locale = { usLocale | decimals = 0 }
+    --> , negativePrefix = Nothing
+    --> , negativeSuffix = Nothing
     --> }
 
     parse { usLocale | decimals = 0 } -1234567.89
-    --> { original = -1234567.89
+    --> { locale = { usLocale | decimals = 0 }
+    --> , original = -1234567.89
     --> , integers = ["1", "234", "568"]
     --> , decimals = Nothing
-    --> , prefix = Just "−"
-    --> , locale = { usLocale | decimals = 0 }
+    --> , negativePrefix = Just "−"
+    --> , negativeSuffix = Just ""
     --> }
 
     parse { usLocale | decimals = 1 } 999.9
-    --> { original = 999.9
+    --> { locale = { usLocale | decimals = 1 }
+    --> , original = 999.9
     --> , integers = ["999"]
     --> , decimals = Just "9"
-    --> , prefix = Nothing
-    --> , locale = { usLocale | decimals = 1 }
+    --> , negativePrefix = Nothing
+    --> , negativeSuffix = Nothing
     --> }
 
     parse { usLocale | decimals = 1 } -999.9
-    --> { original = -999.9
+    --> { locale = { usLocale | decimals = 1 }
+    --> , original = -999.9
     --> , integers = ["999"]
     --> , decimals = Just "9"
-    --> , prefix = Just "−"
-    --> , locale = { usLocale | decimals = 1 }
+    --> , negativePrefix = Just "−"
+    --> , negativeSuffix = Just ""
     --> }
 
     parse usLocale 0.001
-    --> { original = 0.001
+    --> { locale = usLocale
+    --> , original = 0.001
     --> , integers = ["0"]
     --> , decimals = Just "00"
-    --> , prefix = Nothing
-    --> , locale = usLocale
+    --> , negativePrefix = Nothing
+    --> , negativeSuffix = Nothing
     --> }
 
     parse usLocale -0.001
-    --> { original = -0.001
+    --> { locale = usLocale
+    --> , original = -0.001
     --> , integers = ["0"]
     --> , decimals = Just "00"
-    --> , prefix = Nothing
-    --> , locale = usLocale
+    --> , negativePrefix = Nothing
+    --> , negativeSuffix = Nothing
     --> }
 
     parse { usLocale | decimals = 1 } ((2 ^ 39) / 100)
-    --> { original = 5497558138.88
+    --> { locale = { usLocale | decimals = 1 }
+    --> , original = 5497558138.88
     --> , integers = ["5", "497", "558", "138"]
     --> , decimals = Just "9"
-    --> , prefix = Nothing
-    --> , locale = { usLocale | decimals = 1 }
+    --> , negativePrefix = Nothing
+    --> , negativeSuffix = Nothing
     --> }
 
-    >>> import FormatNumber.Locales exposing (usLocale)
-    >>> parse { usLocale | decimals = 1 } ((-2 ^ 39) / 100)
-    { original = -5497558138.88
-    , integers = ["5", "497", "558", "138"]
-    , decimals = Just "9"
-    , prefix = Just "−"
-    , locale = { usLocale | decimals = 1 }
-    }
+    parse { usLocale | decimals = 1 } ((-2 ^ 39) / 100)
+    --> { locale = { usLocale | decimals = 1 }
+    --> , original = -5497558138.88
+    --> , integers = ["5", "497", "558", "138"]
+    --> , decimals = Just "9"
+    --> , negativePrefix = Just "−"
+    --> , negativeSuffix = Just ""
+    --> }
 -}
 parse : Locale -> Float -> FormattedNumber
 parse locale original =
@@ -197,42 +200,58 @@ parse locale original =
             parts
                 |> List.drop 1
                 |> List.head
+
+        partial : FormattedNumber
+        partial =
+            FormattedNumber
+                locale
+                original
+                integers
+                decimals
+                Nothing
+                Nothing
     in
-        addPrefix <| FormattedNumber original integers decimals Nothing locale
+        if isNegative partial then
+            { partial
+                | negativePrefix = Just locale.negativePrefix
+                , negativeSuffix = Just locale.negativeSuffix
+            }
+        else
+            partial
 
 
 {-| Stringify a `FormattedNumber`:
 
     import FormatNumber.Locales exposing (Locale)
 
-    stringfy (FormattedNumber 3.1415 ["3"] (Just "142") Nothing (Locale 3 "." "," "−"))
+    stringfy (FormattedNumber (Locale 3 "." "," "−" "") 3.1415 ["3"] (Just "142") Nothing Nothing)
     --> "3,142"
 
-    stringfy (FormattedNumber -3.1415 ["3"] (Just "142") (Just "−") (Locale 3 "." "," "−"))
+    stringfy (FormattedNumber (Locale 3 "." "," "−" "") -3.1415 ["3"] (Just "142") (Just "−") (Just ""))
     --> "−3,142"
 
-    stringfy (FormattedNumber 1234567.89 ["1", "234", "568"] Nothing Nothing (Locale 0 "." "," "−"))
+    stringfy (FormattedNumber (Locale 0 "." "," "−" "") 1234567.89 ["1", "234", "568"] Nothing Nothing Nothing)
     --> "1.234.568"
 
-    stringfy (FormattedNumber 1234567.89 ["1", "234", "568"] Nothing (Just "−") (Locale 0 "." "," "−"))
+    stringfy (FormattedNumber (Locale 0 "." "," "−" "") 1234567.89 ["1", "234", "568"] Nothing (Just "−") (Just ""))
     --> "−1.234.568"
 
-    stringfy (FormattedNumber 999.9 ["999"] (Just "9") Nothing (Locale 1 "." "," "−"))
+    stringfy (FormattedNumber (Locale 1 "." "," "−" "") 999.9 ["999"] (Just "9") Nothing Nothing)
     --> "999,9"
 
-    stringfy (FormattedNumber 999.9 ["999"] (Just "9") (Just "−") (Locale 1 "." "," "−"))
+    stringfy (FormattedNumber (Locale 1 "." "," "−" "") 999.9 ["999"] (Just "9") (Just "−") (Just ""))
     --> "−999,9"
 
-    stringfy (FormattedNumber 0.001 ["0"] (Just "00") Nothing (Locale 2 "." "," "−"))
+    stringfy (FormattedNumber (Locale 2 "." "," "−" "") 0.001 ["0"] (Just "00") Nothing Nothing)
     --> "0,00"
 
-    stringfy (FormattedNumber 0.001 ["0"] (Just "00") Nothing (Locale 2 "." "," "−"))
+    stringfy (FormattedNumber (Locale 2 "." "," "−" "") 0.001 ["0"] (Just "00") Nothing Nothing)
     --> "0,00"
 
-    stringfy (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] (Just "9") Nothing (Locale 1 "." "," "−"))
+    stringfy (FormattedNumber (Locale 1 "." "," "−" "") 5497558138.88 ["5", "497", "558", "138"] (Just "9") Nothing Nothing)
     --> "5.497.558.138,9"
 
-    stringfy (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] (Just "9") (Just "−") (Locale 1 "." "," "−"))
+    stringfy (FormattedNumber (Locale 1 "." "," "−" "") 5497558138.88 ["5", "497", "558", "138"] (Just "9") (Just "−") (Just ""))
     --> "−5.497.558.138,9"
 -}
 stringfy : FormattedNumber -> String
@@ -248,7 +267,8 @@ stringfy formatted =
                     ""
     in
         String.concat
-            [ Maybe.withDefault "" formatted.prefix
+            [ Maybe.withDefault "" formatted.negativePrefix
             , String.join formatted.locale.thousandSeparator formatted.integers
             , decimals
+            , Maybe.withDefault "" formatted.negativeSuffix
             ]
