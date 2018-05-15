@@ -1,8 +1,8 @@
 {
     "summary": "Format numbers as pretty strings — Test suite",
-    "version": "4.0.2",
+    "version": "5.0.4",
     "repository": "https://github.com/cuducos/elm-format-number.git",
-    "license": "BSD-3-Clause",
+    "license": "BSD3",
     "source-directories": [
         "../src/",
         "."
