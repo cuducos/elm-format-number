@@ -1,6 +1,9 @@
 # Changelog
 
-**5.0.4** (Feb 23, 2018)
+**5.0.5** (May 15, 2018)
+  * Fix test suite
+
+**5.0.4** (May 15, 2018)
   * Update `hoek` dependency due to a vulnerability in older versions of this package
   * Update elm-verify-examples (dependency for development)
 
