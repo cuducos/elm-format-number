@@ -23,31 +23,36 @@ type alias Locale =
     , decimalSeparator : String
     , negativePrefix : String
     , negativeSuffix : String
+    , positivePrefix : String
+    , positiveSuffix : String
     }
 
 
 {-| Locale used in France, Canada, Finland and Sweden. It has 3 decimals
 digits, uses a thin space (`U+202F`) as thousand separator and a `,` as decimal
-separator. It uses a minus sign (not a hyphen).
+separator. It uses a minus sign (not a hyphen) as a prefix for negative
+numbers, but no sufix or prefix for positive numbers.
 -}
 frenchLocale : Locale
 frenchLocale =
-    Locale 3 "\x202F" "," "−" ""
+    Locale 3 "\x202F" "," "−" "" "" ""
 
 
 {-| Locale used in Spain, Italy and Norway. It has 3 decimals digits, uses a
 `.` as thousand separator and a `,` as decimal separator. It uses a minus sign
-(not a hyphen).
+(not a hyphen) as a prefix for negative numbers, but no sufix or prefix for
+positive numbers.
 -}
 spanishLocale : Locale
 spanishLocale =
-    Locale 3 "." "," "−" ""
+    Locale 3 "." "," "−" "" "" ""
 
 
 {-| Locale used in the United States, Great Britain and Thailand. It has 2
 decimals digits, uses a `,` as thousand separator and a `.` as decimal
-separator. It uses a minus sign (not a hyphen).
+separator. It uses a minus sign (not a hyphen) as a prefix for negative
+numbers, no sufix or prefix for positive numbers.
 -}
 usLocale : Locale
 usLocale =
-    Locale 2 "," "." "−" ""
+    Locale 2 "," "." "−" "" "" ""
