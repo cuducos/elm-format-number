@@ -97,5 +97,7 @@ import FormatNumber.Locales as Locales
 
 -}
 format : Locales.Locale -> Float -> String
-format locale num =
-    Helpers.stringfy <| Helpers.parse locale num
+format locale number_ =
+    number_
+        |> Helpers.parse locale
+        |> Helpers.stringfy locale
