@@ -1,5 +1,8 @@
 # Changelog
 
+**6.0.0** (May 15, 2018)
+  * Add positive prefix/suffix to `Locale`s (thanks @joshhornby)
+
 **5.0.5** (May 15, 2018)
   * Fix test suite
 
