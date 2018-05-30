@@ -62,12 +62,14 @@ classify formatted =
                 |> String.concat
                 |> String.all (\char -> char == '0')
     in
-        if onlyZeros then
-            Zero
-        else if formatted.original < 0 then
-            Negative
-        else
-            Positive
+    if onlyZeros then
+        Zero
+
+    else if formatted.original < 0 then
+        Negative
+
+    else
+        Positive
 
 
 {-| Split a `String` in `List String` grouping by thousands digits:
@@ -87,12 +89,13 @@ splitThousands integers =
                     |> String.dropRight 3
                     |> reversedSplitThousands
                     |> (::) (String.right 3 value)
+
             else
                 [ value ]
     in
-        integers
-            |> reversedSplitThousands
-            |> List.reverse
+    integers
+        |> reversedSplitThousands
+        |> List.reverse
 
 
 {-| Given a `Locale` parses a `Float` into a `FormattedNumber`:
@@ -223,21 +226,21 @@ parse locale original =
         partial =
             FormattedNumber original integers decimals "" ""
     in
-        case classify partial of
-            Negative ->
-                { partial
-                    | prefix = locale.negativePrefix
-                    , suffix = locale.negativeSuffix
-                }
+    case classify partial of
+        Negative ->
+            { partial
+                | prefix = locale.negativePrefix
+                , suffix = locale.negativeSuffix
+            }
 
-            Positive ->
-                { partial
-                    | prefix = locale.positivePrefix
-                    , suffix = locale.positiveSuffix
-                }
+        Positive ->
+            { partial
+                | prefix = locale.positivePrefix
+                , suffix = locale.positiveSuffix
+            }
 
-            Zero ->
-                partial
+        Zero ->
+            partial
 
 
 {-| Stringify a `FormattedNumber`:
@@ -297,4 +300,4 @@ stringfy locale formatted =
                 Nothing ->
                     ""
     in
-        String.concat [ formatted.prefix, integers, decimals, formatted.suffix ]
+    String.concat [ formatted.prefix, integers, decimals, formatted.suffix ]

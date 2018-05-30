@@ -1,12 +1,11 @@
-module FormatNumber.Locales exposing (..)
+module FormatNumber.Locales exposing (Locale, frenchLocale, spanishLocale, usLocale)
 
-{-|
-
-These locales and its names are based on this
+{-| These locales and its names are based on this
 [International Language Environments
 Guide](https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html)
 
 @docs Locale
+
 
 # Pre-defined locales
 
@@ -35,7 +34,7 @@ numbers, but no sufix or prefix for positive numbers.
 -}
 frenchLocale : Locale
 frenchLocale =
-    Locale 3 "\x202F" "," "−" "" "" ""
+    Locale 3 "\u{202F}" "," "−" "" "" ""
 
 
 {-| Locale used in Spain, Italy and Norway. It has 3 decimals digits, uses a

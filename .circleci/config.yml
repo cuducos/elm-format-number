@@ -7,7 +7,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: dependencies-node8-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          key: dependencies-node8-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
 
       - run:
           name: Install dependencies
@@ -16,7 +16,7 @@ jobs:
       - save_cache:
           paths:
             - node_modules
-          key: dependencies-node8-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          key: dependencies-node8-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}-{{ checksum "elm.json" }}
 
       - run:
           name: Tests

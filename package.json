@@ -2,13 +2,11 @@
   "name": "elm-format-number",
   "version": "0.0.0",
   "scripts": {
-    "cleanup": "rm -rf tests/Doc tests/elm-stuff tests/Main.elm tests/Tests.elm",
-    "test": "elm-verify-examples",
-    "posttest": "git checkout -- tests/elm-package.json"
+    "test": "elm-verify-examples"
   },
   "devDependencies": {
-    "elm": "^0.18.0",
-    "elm-test": "^0.18.12",
-    "elm-verify-examples": "^2.3.1"
+    "elm": "^0.19.0",
+    "elm-test": "^0.19.0-beta4",
+    "elm-verify-examples": "^3.0.0"
   }
 }
