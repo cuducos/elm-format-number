@@ -95,6 +95,15 @@ import FormatNumber.Locales as Locales
     format { usLocale | positiveSuffix = "+" } 1.0
     --> "1.00+"
 
+    format usLocale 7.34767309e22
+    --> "73,476,730,900,000,000,000,000.00"
+
+    format usLocale 7.34767309e+22
+    --> "73,476,730,900,000,000,000,000.00"
+
+    format usLocale 7.34767309e-22
+    --> "0.00"
+
 -}
 format : Locales.Locale -> Float -> String
 format locale number_ =
