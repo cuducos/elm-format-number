@@ -1,5 +1,8 @@
 # Changelog
 
+**6.0.1** (Jul 12, 2018)
+  * Use `elm-round` 1.0.3 (or higher) to fix the bug with too large (or tiny) numbers (usually with scientific notation)
+
 **6.0.0** (May 15, 2018)
   * Add positive prefix/suffix to `Locale`s (thanks @joshhornby)
 
