@@ -1,5 +1,8 @@
 # Changelog
 
+**6.0.2** (Aug 28, 2018)
+  * Upgrade to Elm 0.19
+
 **6.0.1** (Jul 12, 2018)
   * Use `elm-round` 1.0.3 (or higher) to fix the bug with too large (or tiny) numbers (usually with scientific notation)
 
