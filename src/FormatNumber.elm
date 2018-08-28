@@ -21,8 +21,8 @@ Just convert them to `Float` before passing them to `format`:
 
 -}
 
-import Helpers
 import FormatNumber.Locales as Locales
+import Helpers
 
 
 {-| Format a float number as a pretty string:
