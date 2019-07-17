@@ -6,8 +6,8 @@ This simple [Elm](http://elm-lang.com) package formats `float` numbers as pretty
 import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (spanishLocale, usLocale)
 
-format usLocale (pi * 1000)  -- "3,141.59"
-format spanishLocale (pi * 1000)  -- "3.141,59"
+format usLocale (pi * 1000)  --> "3,141.59"
+format spanishLocale (pi * 1000)  --> "3.141,59"
 ```
 
 It is flexible enough to deal with different number of decimals, different thousand separators, different decimal separator, and different ways to represent negative numbers — all that is possible using `Locale`s.
@@ -26,15 +26,15 @@ sharesLocale =
         , negativeSuffix = ")"
     }
 
-format usLocale -pi -- "−3.14"
-format sharesLocale -pi -- "(3.142)"
+format usLocale -pi --> "−3.14"
+format sharesLocale -pi --> "(3.142)"
 ```
 
 The API is further documented in [package.elm-lang.org](http://package.elm-lang.org/packages/cuducos/elm-format-number/latest/FormatNumber).
 
 ## Tests
 
-This package uses [elm-verify-examples](https://www.npmjs.com/package/elm-doc-test), all the examples in the documentation are automatically tested:
+This package uses [elm-verify-examples](https://www.npmjs.com/package/elm-verify-examples), all the examples in the documentation are automatically tested:
 
 ```console
 $ npm install
