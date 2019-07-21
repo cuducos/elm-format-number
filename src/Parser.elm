@@ -1,6 +1,7 @@
-module Helpers exposing (..)
+module Parser exposing (Category(..), FormattedNumber, classify, parse, splitThousands)
 
 import Char
+import FormatNumber.Humanize exposing (ZeroStrategy(..))
 import FormatNumber.Locales exposing (Locale)
 import Round
 
@@ -20,7 +21,7 @@ type Category
 type alias FormattedNumber =
     { original : Float
     , integers : List String
-    , decimals : Maybe String
+    , decimals : String
     , prefix : String
     , suffix : String
     }
@@ -28,25 +29,25 @@ type alias FormattedNumber =
 
 {-| Identify if the formatted version of a number is negative:
 
-    classify (FormattedNumber 1.2 ["1"] (Just "2") "" "")
+    classify (FormattedNumber 1.2 ["1"] "2" "" "")
     --> Positive
 
-    classify (FormattedNumber 0 ["0"] Nothing "" "")
+    classify (FormattedNumber 0 ["0"] "" "" "")
     --> Zero
 
-    classify (FormattedNumber -1 ["1"] (Just "0") "" "")
+    classify (FormattedNumber -1 ["1"] "0" "" "")
     --> Negative
 
-    classify (FormattedNumber 0 ["0"] (Just "000") "" "")
+    classify (FormattedNumber 0 ["0"] "000" "" "")
     --> Zero
 
-    classify (FormattedNumber -0.01 ["0"] (Just "0") "" "")
+    classify (FormattedNumber -0.01 ["0"] "0" "" "")
     --> Zero
 
-    classify (FormattedNumber -0.01 ["0"] (Just "01") "" "")
+    classify (FormattedNumber -0.01 ["0"] "01" "" "")
     --> Negative
 
-    classify (FormattedNumber 0.01 ["0"] (Just "01") "" "")
+    classify (FormattedNumber 0.01 ["0"] "01" "" "")
     --> Positive
 
 -}
@@ -56,7 +57,6 @@ classify formatted =
         onlyZeros : Bool
         onlyZeros =
             formatted.decimals
-                |> Maybe.withDefault ""
                 |> List.singleton
                 |> List.append formatted.integers
                 |> String.concat
@@ -74,7 +74,7 @@ classify formatted =
 
 {-| Split a `String` in `List String` grouping by thousands digits:
 
-    splitThousands "12345"  --> [ "12", "345" ]
+    splitThousands "12345" --> [ "12", "345" ]
 
     splitThousands "12" --> [ "12" ]
 
@@ -105,7 +105,7 @@ splitThousands integers =
     parse { usLocale | decimals = 3 } 3.1415
     --> { original = 3.1415
     --> , integers = ["3"]
-    --> , decimals = Just "142"
+    --> , decimals = "142"
     --> , prefix = ""
     --> , suffix = ""
     --> }
@@ -113,7 +113,7 @@ splitThousands integers =
     parse { usLocale | decimals = 3 } -3.1415
     --> { original = -3.1415
     --> , integers = ["3"]
-    --> , decimals = Just "141"
+    --> , decimals = "141"
     --> , prefix = "−"
     --> , suffix = ""
     --> }
@@ -121,7 +121,7 @@ splitThousands integers =
     parse { usLocale | decimals = 3, positiveSuffix = "+" } 3.1415
     --> { original = 3.1415
     --> , integers = ["3"]
-    --> , decimals = Just "142"
+    --> , decimals = "142"
     --> , prefix = ""
     --> , suffix = "+"
     --> }
@@ -129,7 +129,7 @@ splitThousands integers =
     parse { usLocale | decimals = 0 } 1234567.89
     --> { original = 1234567.89
     --> , integers = ["1", "234", "568"]
-    --> , decimals = Nothing
+    --> , decimals = ""
     --> , prefix = ""
     --> , suffix = ""
     --> }
@@ -137,7 +137,7 @@ splitThousands integers =
     parse { usLocale | decimals = 0 } -1234567.89
     --> { original = -1234567.89
     --> , integers = ["1", "234", "568"]
-    --> , decimals = Nothing
+    --> , decimals = ""
     --> , prefix = "−"
     --> , suffix = ""
     --> }
@@ -145,7 +145,7 @@ splitThousands integers =
     parse { usLocale | decimals = 1 } 999.9
     --> { original = 999.9
     --> , integers = ["999"]
-    --> , decimals = Just "9"
+    --> , decimals = "9"
     --> , prefix = ""
     --> , suffix = ""
     --> }
@@ -153,7 +153,7 @@ splitThousands integers =
     parse { usLocale | decimals = 1 } -999.9
     --> { original = -999.9
     --> , integers = ["999"]
-    --> , decimals = Just "9"
+    --> , decimals = "9"
     --> , prefix = "−"
     --> , suffix = ""
     --> }
@@ -161,7 +161,7 @@ splitThousands integers =
     parse usLocale 0.001
     --> { original = 0.001
     --> , integers = ["0"]
-    --> , decimals = Just "00"
+    --> , decimals = "00"
     --> , prefix = ""
     --> , suffix = ""
     --> }
@@ -169,7 +169,7 @@ splitThousands integers =
     parse usLocale 0.001
     --> { original = 0.001
     --> , integers = ["0"]
-    --> , decimals = Just "00"
+    --> , decimals = "00"
     --> , prefix = ""
     --> , suffix = ""
     --> }
@@ -177,7 +177,7 @@ splitThousands integers =
     parse usLocale -0.001
     --> { original = -0.001
     --> , integers = ["0"]
-    --> , decimals = Just "00"
+    --> , decimals = "00"
     --> , prefix = ""
     --> , suffix = ""
     --> }
@@ -185,7 +185,7 @@ splitThousands integers =
     parse { usLocale | decimals = 1 } ((2 ^ 39) / 100)
     --> { original = 5497558138.88
     --> , integers = ["5", "497", "558", "138"]
-    --> , decimals = Just "9"
+    --> , decimals = "9"
     --> , prefix = ""
     --> , suffix = ""
     --> }
@@ -193,7 +193,7 @@ splitThousands integers =
     parse { usLocale | decimals = 1 } ((-2 ^ 39) / 100)
     --> { original = -5497558138.88
     --> , integers = ["5", "497", "558", "138"]
-    --> , decimals = Just "9"
+    --> , decimals = "9"
     --> , prefix = "−"
     --> , suffix = ""
     --> }
@@ -216,11 +216,12 @@ parse locale original =
                 |> String.filter Char.isDigit
                 |> splitThousands
 
-        decimals : Maybe String
+        decimals : String
         decimals =
             parts
                 |> List.drop 1
                 |> List.head
+                |> Maybe.withDefault ""
 
         partial : FormattedNumber
         partial =
@@ -241,63 +242,3 @@ parse locale original =
 
         Zero ->
             partial
-
-
-{-| Stringify a `FormattedNumber`:
-
-    import FormatNumber.Locales exposing (Locale)
-
-    stringfy (Locale 3 "." "," "−" "" "" "") (FormattedNumber 3.1415 ["3"] (Just "142") "" "")
-    --> "3,142"
-
-    stringfy (Locale 3 "." "," "−" "" "" "") (FormattedNumber -3.1415 ["3"] (Just "142") "−" "")
-    --> "−3,142"
-
-    stringfy (Locale 0 "." "," "−" "" "" "") (FormattedNumber 1234567.89 ["1", "234", "568"] Nothing "" "")
-    --> "1.234.568"
-
-    stringfy (Locale 0 "." "," "−" "" "" "") (FormattedNumber 1234567.89 ["1", "234", "568"] Nothing "−" "")
-    --> "−1.234.568"
-
-    stringfy (Locale 1 "." "," "−" "" "+" "") (FormattedNumber 999.9 ["999"] (Just "9") "+" "")
-    --> "+999,9"
-
-    stringfy (Locale 1 "." "," "−" "" "" "+") (FormattedNumber 999.9 ["999"] (Just "9") "" "+")
-    --> "999,9+"
-
-    stringfy (Locale 1 "." "," "−" "" "" "") (FormattedNumber 999.9 ["999"] (Just "9") "−"  "")
-    --> "−999,9"
-
-    stringfy (Locale 1 "." "," "−" "" "" "") (FormattedNumber 999.9 ["999"] (Just "9") "−" "")
-    --> "−999,9"
-
-    stringfy (Locale 2 "." "," "−" "" "" "") (FormattedNumber 0.001 ["0"] (Just "00") "" "")
-    --> "0,00"
-
-    stringfy (Locale 2 "." "," "−" "" "" "") (FormattedNumber 0.001 ["0"] (Just "00") "" "")
-    --> "0,00"
-
-    stringfy (Locale 1 "." "," "−" "" "" "") (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] (Just "9") "" "")
-    --> "5.497.558.138,9"
-
-    stringfy (Locale 1 "." "," "−" "" "" "") (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] (Just "9") "−" "")
-    --> "−5.497.558.138,9"
-
--}
-stringfy : Locale -> FormattedNumber -> String
-stringfy locale formatted =
-    let
-        integers : String
-        integers =
-            String.join locale.thousandSeparator formatted.integers
-
-        decimals : String
-        decimals =
-            case formatted.decimals of
-                Just digits ->
-                    locale.decimalSeparator ++ digits
-
-                Nothing ->
-                    ""
-    in
-    String.concat [ formatted.prefix, integers, decimals, formatted.suffix ]

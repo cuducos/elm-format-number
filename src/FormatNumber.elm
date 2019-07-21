@@ -1,10 +1,17 @@
-module FormatNumber exposing (format)
+module FormatNumber exposing
+    ( format
+    , humanize
+    )
 
 {-| This simple package formats `Float` numbers as pretty strings. It is
 flexible enough to deal with different number of decimals, different thousand
 separators and different decimal separator.
 
 @docs format
+
+It also `humanize`s decimals numbers with different strategies for handling zeros:
+
+@docs humanize
 
 
 ## What about `Int` numbers?
@@ -21,8 +28,10 @@ Just convert them to `Float` before passing them to `format`:
 
 -}
 
+import FormatNumber.Humanize exposing (ZeroStrategy(..))
 import FormatNumber.Locales as Locales
-import Helpers
+import Parser exposing (parse)
+import Stringfy exposing (stringfy)
 
 
 {-| Format a float number as a pretty string:
@@ -108,5 +117,30 @@ import Helpers
 format : Locales.Locale -> Float -> String
 format locale number_ =
     number_
-        |> Helpers.parse locale
-        |> Helpers.stringfy locale
+        |> Parser.parse locale
+        |> Stringfy.stringfy locale Nothing
+
+
+{-| Humanize the decimal part of a float with different strategies to remove
+tail zeros:
+
+    import FormatNumber exposing (humanize)
+    import FormatNumber.Humanize exposing (ZeroStrategy(..))
+    import FormatNumber.Locales exposing (usLocale)
+
+    humanize usLocale RemoveZeros 10.00
+    --> "10"
+    humanize usLocale RemoveZeros 10.10
+    --> "10.1"
+
+    humanize usLocale KeepZeros 10.00
+    --> "10"
+    humanize usLocale KeepZeros 10.10
+    --> "10.10"
+
+-}
+humanize : Locales.Locale -> ZeroStrategy -> Float -> String
+humanize locale strategy number_ =
+    number_
+        |> parse locale
+        |> stringfy locale (Just strategy)

@@ -1,4 +1,7 @@
-module FormatNumber.Locales exposing (Locale, frenchLocale, spanishLocale, usLocale)
+module FormatNumber.Locales exposing
+    ( Locale
+    , frenchLocale, spanishLocale, usLocale
+    )
 
 {-| These locales and its names are based on this
 [International Language Environments

@@ -1,4 +1,4 @@
 {
   "root": "../src",
-  "tests": [ "FormatNumber", "Helpers", "./README.md" ]
+  "tests": [ "FormatNumber", "Parser", "Stringfy",  "./README.md" ]
 }
