@@ -1,5 +1,8 @@
 # Changelog
 
+**6.1.0** (Jul 21, 2019)
+  * Add `humanize` function
+
 **6.0.2** (Aug 28, 2018)
   * Upgrade to Elm 0.19
 

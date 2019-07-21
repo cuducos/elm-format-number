@@ -3,7 +3,7 @@
     "name": "cuducos/elm-format-number",
     "summary": "Format numbers as pretty strings",
     "license": "BSD-3-Clause",
-    "version": "6.0.2",
+    "version": "6.1.0",
     "exposed-modules": [
         "FormatNumber",
         "FormatNumber.Locales"
