@@ -11,52 +11,52 @@ import Parser exposing (FormattedNumber)
     import FormatNumber.Locales exposing (Locale)
     import Parser exposing (FormattedNumber)
 
-    stringfy (Locale 3 "." "," "−" "" "" "") Nothing (FormattedNumber 3.1415 ["3"] "142" "" "")
+    stringfy (Locale 3 "." "," "−" "" "" "" "" "") Nothing (FormattedNumber 3.1415 ["3"] "142" "" "")
     --> "3,142"
 
-    stringfy (Locale 3 "." "," "−" "" "" "") Nothing (FormattedNumber -3.1415 ["3"] "142" "−" "")
+    stringfy (Locale 3 "." "," "−" "" "" "" "" "") Nothing (FormattedNumber -3.1415 ["3"] "142" "−" "")
     --> "−3,142"
 
-    stringfy (Locale 0 "." "," "−" "" "" "") Nothing (FormattedNumber 1234567.89 ["1", "234", "568"] "" "" "")
+    stringfy (Locale 0 "." "," "−" "" "" "" "" "") Nothing (FormattedNumber 1234567.89 ["1", "234", "568"] "" "" "")
     --> "1.234.568"
 
-    stringfy (Locale 0 "." "," "−" "" "" "") Nothing (FormattedNumber 1234567.89 ["1", "234", "568"] "" "−" "")
+    stringfy (Locale 0 "." "," "−" "" "" "" "" "") Nothing (FormattedNumber 1234567.89 ["1", "234", "568"] "" "−" "")
     --> "−1.234.568"
 
-    stringfy (Locale 1 "." "," "−" "" "+" "") Nothing (FormattedNumber 999.9 ["999"] "9" "+" "")
+    stringfy (Locale 1 "." "," "−" "" "+" "" "" "") Nothing (FormattedNumber 999.9 ["999"] "9" "+" "")
     --> "+999,9"
 
-    stringfy (Locale 1 "." "," "−" "" "" "+") Nothing (FormattedNumber 999.9 ["999"] "9" "" "+")
+    stringfy (Locale 1 "." "," "−" "" "" "+" "" "") Nothing (FormattedNumber 999.9 ["999"] "9" "" "+")
     --> "999,9+"
 
-    stringfy (Locale 1 "." "," "−" "" "" "") Nothing (FormattedNumber 999.9 ["999"] "9" "−"  "")
+    stringfy (Locale 1 "." "," "−" "" "" "" "" "") Nothing (FormattedNumber 999.9 ["999"] "9" "−"  "")
     --> "−999,9"
 
-    stringfy (Locale 1 "." "," "−" "" "" "") Nothing (FormattedNumber 999.9 ["999"] "9" "−" "")
+    stringfy (Locale 1 "." "," "−" "" "" "" "" "") Nothing (FormattedNumber 999.9 ["999"] "9" "−" "")
     --> "−999,9"
 
-    stringfy (Locale 2 "." "," "−" "" "" "") Nothing (FormattedNumber 0.001 ["0"] "00" "" "")
+    stringfy (Locale 2 "." "," "−" "" "" "" "" "") Nothing (FormattedNumber 0.001 ["0"] "00" "" "")
     --> "0,00"
 
-    stringfy (Locale 2 "." "," "−" "" "" "") Nothing (FormattedNumber 0.001 ["0"] "00" "" "")
+    stringfy (Locale 2 "." "," "−" "" "" "" "" "") Nothing (FormattedNumber 0.001 ["0"] "00" "" "")
     --> "0,00"
 
-    stringfy (Locale 1 "." "," "−" "" "" "") Nothing (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] "9" "" "")
+    stringfy (Locale 1 "." "," "−" "" "" "" "" "") Nothing (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] "9" "" "")
     --> "5.497.558.138,9"
 
-    stringfy (Locale 1 "." "," "−" "" "" "") Nothing (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] "9" "−" "")
+    stringfy (Locale 1 "." "," "−" "" "" "" "" "") Nothing (FormattedNumber 5497558138.88 ["5", "497", "558", "138"] "9" "−" "")
     --> "−5.497.558.138,9"
 
-    stringfy (Locale 2 "." "," "−" "" "" "") (Just KeepZeros) (FormattedNumber 10.0 ["10"] "00" "" "")
+    stringfy (Locale 2 "." "," "−" "" "" "" "" "") (Just KeepZeros) (FormattedNumber 10.0 ["10"] "00" "" "")
     --> "10"
 
-    stringfy (Locale 2 "." "," "−" "" "" "") (Just KeepZeros) (FormattedNumber 10.1 ["10"] "10" "" "")
+    stringfy (Locale 2 "." "," "−" "" "" "" "" "") (Just KeepZeros) (FormattedNumber 10.1 ["10"] "10" "" "")
     --> "10,10"
 
-    stringfy (Locale 2 "." "," "−" "" "" "") (Just RemoveZeros) (FormattedNumber 10.0 ["10"] "00" "" "")
+    stringfy (Locale 2 "." "," "−" "" "" "" "" "") (Just RemoveZeros) (FormattedNumber 10.0 ["10"] "00" "" "")
     --> "10"
 
-    stringfy (Locale 2 "." "," "−" "" "" "") (Just RemoveZeros) (FormattedNumber 10.1 ["10"] "10" "" "")
+    stringfy (Locale 2 "." "," "−" "" "" "" "" "") (Just RemoveZeros) (FormattedNumber 10.1 ["10"] "10" "" "")
     --> "10,1"
 
 -}

@@ -126,6 +126,30 @@ splitThousands integers =
     --> , suffix = "+"
     --> }
 
+    parse { usLocale | negativePrefix = "(", negativeSuffix = ")", positiveSuffix = " ", zeroSuffix = " " } -12.34
+    --> { original = -12.34
+    --> , integers = ["12"]
+    --> , decimals = "34"
+    --> , prefix = "("
+    --> , suffix = ")"
+    --> }
+
+    parse { usLocale | negativePrefix = "(", negativeSuffix = ")", positiveSuffix = " ", zeroSuffix = " " } 12.34
+    --> { original = 12.34
+    --> , integers = ["12"]
+    --> , decimals = "34"
+    --> , prefix = ""
+    --> , suffix = " "
+    --> }
+
+    parse { usLocale | negativePrefix = "(", negativeSuffix = ")", positiveSuffix = " ", zeroSuffix = " " } 0.0
+    --> { original = 0.0
+    --> , integers = ["0"]
+    --> , decimals = "00"
+    --> , prefix = ""
+    --> , suffix = " "
+    --> }
+
     parse { usLocale | decimals = 0 } 1234567.89
     --> { original = 1234567.89
     --> , integers = ["1", "234", "568"]
@@ -241,4 +265,7 @@ parse locale original =
             }
 
         Zero ->
-            partial
+            { partial
+                | prefix = locale.zeroPrefix
+                , suffix = locale.zeroSuffix
+            }

@@ -27,6 +27,8 @@ type alias Locale =
     , negativeSuffix : String
     , positivePrefix : String
     , positiveSuffix : String
+    , zeroPrefix : String
+    , zeroSuffix : String
     }
 
 
@@ -37,7 +39,7 @@ numbers, but no sufix or prefix for positive numbers.
 -}
 frenchLocale : Locale
 frenchLocale =
-    Locale 3 "\u{202F}" "," "−" "" "" ""
+    Locale 3 "\u{202F}" "," "−" "" "" "" "" ""
 
 
 {-| Locale used in Spain, Italy and Norway. It has 3 decimals digits, uses a
@@ -47,7 +49,7 @@ positive numbers.
 -}
 spanishLocale : Locale
 spanishLocale =
-    Locale 3 "." "," "−" "" "" ""
+    Locale 3 "." "," "−" "" "" "" "" ""
 
 
 {-| Locale used in the United States, Great Britain and Thailand. It has 2
@@ -57,4 +59,4 @@ numbers, no sufix or prefix for positive numbers.
 -}
 usLocale : Locale
 usLocale =
-    Locale 2 "," "." "−" "" "" ""
+    Locale 2 "," "." "−" "" "" "" "" ""
