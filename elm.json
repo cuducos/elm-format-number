@@ -3,7 +3,7 @@
     "name": "coinop-logan/elm-format-number",
     "summary": "Format numbers as pretty strings",
     "license": "BSD-3-Clause",
-    "version": "6.2.0",
+    "version": "1.0.0",
     "exposed-modules": [
         "FormatNumber",
         "FormatNumber.Locales",
