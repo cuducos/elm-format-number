@@ -4,7 +4,7 @@ module FormatNumber.Humanize exposing (ZeroStrategy(..))
 zeros. `KeepZeros` will only remove decimals if all digits are zeros, while
 `RemoveZeros` will shorten the decimals removing ending zeros.
 
-@docs Humanize
+@docs ZeroStrategy
 
 -}
 
