@@ -1,6 +1,6 @@
 {
     "type": "package",
-    "name": "cuducos/elm-format-number",
+    "name": "coinop-logan/elm-format-number",
     "summary": "Format numbers as pretty strings",
     "license": "BSD-3-Clause",
     "version": "6.2.0",
