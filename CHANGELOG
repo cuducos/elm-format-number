@@ -1,5 +1,8 @@
 # Changelog
 
+**6.2.0** (Sep 7, 2019)
+  * Expose `Humanize` module, enhancing documentation (thanks @ coinop-logan)
+
 **6.1.0** (Jul 21, 2019)
   * Add `humanize` function
 
