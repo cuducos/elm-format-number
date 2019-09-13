@@ -38,31 +38,31 @@ import Stringfy exposing (stringfy)
 
     import FormatNumber.Locales exposing (Locale, frenchLocale, spanishLocale, usLocale)
 
-    format { decimals = 2, thousandSeparator = ".", decimalSeparator = ",", negativePrefix = "−", negativeSuffix = "", positivePrefix = "", positiveSuffix = "" } 123456.789
+    format { decimals = 2, thousandSeparator = ".", decimalSeparator = ",", negativePrefix = "−", negativeSuffix = "", positivePrefix = "", positiveSuffix = "", zeroPrefix = "", zeroSuffix = "" } 123456.789
     --> "123.456,79"
 
-    format { decimals = 2, thousandSeparator = ",", decimalSeparator = ".", negativePrefix = "−", negativeSuffix = "", positivePrefix = "", positiveSuffix = "" } 1234.5567
+    format { decimals = 2, thousandSeparator = ",", decimalSeparator = ".", negativePrefix = "−", negativeSuffix = "", positivePrefix = "", positiveSuffix = "", zeroPrefix = "", zeroSuffix = "" } 1234.5567
     --> "1,234.56"
 
-    format (Locale 3 "." "," "−" "" "" "") -7654.3210
+    format (Locale 3 "." "," "−" "" "" "" "" "") -7654.3210
     --> "−7.654,321"
 
-    format (Locale 1 "," "." "−" "" "" "") -0.01
+    format (Locale 1 "," "." "−" "" "" "" "" "") -0.01
     --> "0.0"
 
-    format (Locale 2 "," "." "−" "" "" "") 0.01
+    format (Locale 2 "," "." "−" "" "" "" "" "") 0.01
     --> "0.01"
 
-    format (Locale 0 "," "." "−" "" "" "") 123.456
+    format (Locale 0 "," "." "−" "" "" "" "" "") 123.456
     --> "123"
 
-    format (Locale 0 "," "." "−" "" "" "") 1e9
+    format (Locale 0 "," "." "−" "" "" "" "" "") 1e9
     --> "1,000,000,000"
 
-    format (Locale 5 "," "." "−" "" "" "") 1.0
+    format (Locale 5 "," "." "−" "" "" "" "" "") 1.0
     --> "1.00000"
 
-    format (Locale 2 "," "." "(" ")" "" "") -1.0
+    format (Locale 2 "," "." "(" ")" "" "" "" "") -1.0
     --> "(1.00)"
 
     format usLocale pi
