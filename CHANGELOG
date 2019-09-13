@@ -1,5 +1,8 @@
 # Changelog
 
+**7.0.0** (Sep 12, 2019)
+  * Add zero prefix and suffix (thanks @LemonIceScream)
+
 **6.2.0** (Sep 7, 2019)
   * Expose `Humanize` module, enhancing documentation (thanks @ coinop-logan)
 
