@@ -1,6 +1,6 @@
 # Elm Format Number [![Build Status](https://circleci.com/gh/cuducos/elm-format-number.svg?style=shield)](https://circleci.com/gh/cuducos/elm-format-number)
 
-This simple [Elm](http://elm-lang.com) package formats `Float` numbers as pretty strings.
+This simple [Elm](https://elm-lang.org) package formats `Float` numbers as pretty strings.
 
 ## Format
 
