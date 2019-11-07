@@ -35,7 +35,7 @@ type alias Locale =
 {-| Locale used in France, Canada, Finland and Sweden. It has 3 decimals
 digits, uses a thin space (`U+202F`) as thousand separator and a `,` as decimal
 separator. It uses a minus sign (not a hyphen) as a prefix for negative
-numbers, but no sufix or prefix for positive numbers.
+numbers, but no suffix or prefix for positive numbers.
 -}
 frenchLocale : Locale
 frenchLocale =
@@ -44,7 +44,7 @@ frenchLocale =
 
 {-| Locale used in Spain, Italy and Norway. It has 3 decimals digits, uses a
 `.` as thousand separator and a `,` as decimal separator. It uses a minus sign
-(not a hyphen) as a prefix for negative numbers, but no sufix or prefix for
+(not a hyphen) as a prefix for negative numbers, but no suffix or prefix for
 positive numbers.
 -}
 spanishLocale : Locale
@@ -55,7 +55,7 @@ spanishLocale =
 {-| Locale used in the United States, Great Britain and Thailand. It has 2
 decimals digits, uses a `,` as thousand separator and a `.` as decimal
 separator. It uses a minus sign (not a hyphen) as a prefix for negative
-numbers, no sufix or prefix for positive numbers.
+numbers, no suffix or prefix for positive numbers.
 -}
 usLocale : Locale
 usLocale =
