@@ -2,7 +2,7 @@ module Parser exposing (Category(..), FormattedNumber, classify, parse, splitTho
 
 import Char
 import FormatNumber.Humanize exposing (ZeroStrategy(..))
-import FormatNumber.Locales exposing (Locale)
+import FormatNumber.Locales exposing (Decimals(..), Locale)
 import Round
 
 
@@ -229,7 +229,16 @@ parse locale original =
         parts : List String
         parts =
             original
-                |> Round.round locale.decimals
+                |> (case locale.decimals of
+                        Max max ->
+                            Round.round max
+
+                        Min _ ->
+                            String.fromFloat
+
+                        Exact exact ->
+                            Round.round exact
+                   )
                 |> String.split "."
 
         integers : List String
@@ -245,7 +254,35 @@ parse locale original =
             parts
                 |> List.drop 1
                 |> List.head
-                |> Maybe.withDefault ""
+                |> (\maybeDigits ->
+                        case locale.decimals of
+                            Max _ ->
+                                maybeDigits
+                                    |> Maybe.map removeZeros
+                                    |> Maybe.withDefault ""
+
+                            Exact _ ->
+                                maybeDigits
+                                    |> Maybe.withDefault ""
+
+                            Min min ->
+                                let
+                                    decimalDigits =
+                                        maybeDigits
+                                            |> Maybe.withDefault ""
+
+                                    digitsLength =
+                                        String.length decimalDigits
+
+                                    missingDigits =
+                                        if digitsLength < min then
+                                            abs <| digitsLength - min
+
+                                        else
+                                            0
+                                in
+                                decimalDigits ++ String.repeat missingDigits "0"
+                   )
 
         partial : FormattedNumber
         partial =
@@ -269,3 +306,16 @@ parse locale original =
                 | prefix = locale.zeroPrefix
                 , suffix = locale.zeroSuffix
             }
+
+
+{-| Remove all zeros from the tail of a string.
+-}
+removeZeros : String -> String
+removeZeros decimals =
+    if String.right 1 decimals /= "0" then
+        decimals
+
+    else
+        decimals
+            |> String.dropRight 1
+            |> removeZeros

@@ -1,7 +1,7 @@
 module Stringfy exposing (formatDecimals, humanizeDecimals, stringfy)
 
 import FormatNumber.Humanize exposing (ZeroStrategy(..))
-import FormatNumber.Locales exposing (Locale)
+import FormatNumber.Locales exposing (Decimals(..), Locale)
 import Parser exposing (FormattedNumber)
 
 
@@ -107,15 +107,34 @@ removeZeros decimals =
 
 humanizeDecimals : Locale -> ZeroStrategy -> String -> String
 humanizeDecimals locale strategy decimals =
-    if decimals == "" || String.repeat locale.decimals "0" == decimals then
-        ""
+    case locale.decimals of
+        Min _ ->
+            locale.decimalSeparator ++ decimals
 
-    else
-        case strategy of
-            KeepZeros ->
-                locale.decimalSeparator ++ decimals
+        Max max ->
+            if decimals == "" || String.repeat max "0" == decimals then
+                ""
 
-            RemoveZeros ->
-                decimals
-                    |> removeZeros
-                    |> formatDecimals locale
+            else
+                case strategy of
+                    KeepZeros ->
+                        locale.decimalSeparator ++ decimals
+
+                    RemoveZeros ->
+                        decimals
+                            |> removeZeros
+                            |> formatDecimals locale
+
+        Exact _ ->
+            if decimals == "" then
+                ""
+
+            else
+                case strategy of
+                    KeepZeros ->
+                        locale.decimalSeparator ++ decimals
+
+                    RemoveZeros ->
+                        decimals
+                            |> removeZeros
+                            |> formatDecimals locale

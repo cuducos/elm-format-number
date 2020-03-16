@@ -1,6 +1,7 @@
 module FormatNumber.Locales exposing
     ( Locale
     , frenchLocale, spanishLocale, usLocale
+    , Decimals(..), base, getDecimals
     )
 
 {-| These locales and its names are based on this
@@ -17,10 +18,29 @@ Guide](https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html)
 -}
 
 
+type Decimals
+    = Min Int
+    | Max Int
+    | Exact Int
+
+
+getDecimals : Decimals -> Int
+getDecimals decimals =
+    case decimals of
+        Min numberOfDecimals ->
+            numberOfDecimals
+
+        Max numberOfDecimals ->
+            numberOfDecimals
+
+        Exact numberOfDecimals ->
+            numberOfDecimals
+
+
 {-| This is the `Locale` type and constructor.
 -}
 type alias Locale =
-    { decimals : Int
+    { decimals : Decimals
     , thousandSeparator : String
     , decimalSeparator : String
     , negativePrefix : String
@@ -32,6 +52,20 @@ type alias Locale =
     }
 
 
+base : Locale
+base =
+    { decimals = Min 0
+    , thousandSeparator = ""
+    , decimalSeparator = "."
+    , negativePrefix = "−"
+    , negativeSuffix = ""
+    , positivePrefix = ""
+    , positiveSuffix = ""
+    , zeroPrefix = ""
+    , zeroSuffix = ""
+    }
+
+
 {-| Locale used in France, Canada, Finland and Sweden. It has 3 decimals
 digits, uses a thin space (`U+202F`) as thousand separator and a `,` as decimal
 separator. It uses a minus sign (not a hyphen) as a prefix for negative
@@ -39,7 +73,7 @@ numbers, but no suffix or prefix for positive numbers.
 -}
 frenchLocale : Locale
 frenchLocale =
-    Locale 3 "\u{202F}" "," "−" "" "" "" "" ""
+    Locale (Exact 3) "\u{202F}" "," "−" "" "" "" "" ""
 
 
 {-| Locale used in Spain, Italy and Norway. It has 3 decimals digits, uses a
@@ -49,7 +83,7 @@ positive numbers.
 -}
 spanishLocale : Locale
 spanishLocale =
-    Locale 3 "." "," "−" "" "" "" "" ""
+    Locale (Exact 3) "." "," "−" "" "" "" "" ""
 
 
 {-| Locale used in the United States, Great Britain and Thailand. It has 2
@@ -59,4 +93,4 @@ numbers, no suffix or prefix for positive numbers.
 -}
 usLocale : Locale
 usLocale =
-    Locale 2 "," "." "−" "" "" "" "" ""
+    Locale (Exact 2) "," "." "−" "" "" "" "" ""

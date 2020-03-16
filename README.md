@@ -11,19 +11,19 @@ import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (spanishLocale, usLocale)
 
 format usLocale (pi * 1000)  --> "3,141.59"
-format spanishLocale (pi * 1000)  --> "3.141,59"
+format spanishLocale (pi * 1000)  --> "3.141,593"
 ```
 
 It is flexible enough to deal with different number of decimals, different thousand separators, different decimal separator, and different ways to represent negative numbers — all that is possible using `Locale`s.
 
 ```elm
 import FormatNumber exposing (format)
-import FormatNumber.Locales exposing (Locale, usLocale)
+import FormatNumber.Locales exposing (Locale, usLocale, Decimals(..))
 
 sharesLocale : Locale
 sharesLocale =
     { usLocale
-        | decimals = 3
+        | decimals = Exact 3
         , negativePrefix = "("
         , negativeSuffix = ")"
     }
