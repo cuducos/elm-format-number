@@ -105,6 +105,36 @@ import Stringfy exposing (stringfy)
     format usLocale 7.34767309e-22
     --> "0.00"
 
+    format (Locale (Exact 3) "." "," "−" "" "" "" "" "") 123
+    --> "123,000"
+
+    format (Locale (Min 3) "." "," "−" "" "" "" "" "") 123.45678
+    --> "123,45678"
+
+    format (Locale (Min 0) "." "," "−" "" "" "" "" "") 1230
+    --> "1.230"
+
+    format (Locale (Min 3) "." "," "−" "" "" "" "" "") 123.45600
+    --> "123,456"
+
+    format (Locale (Min 3) "." "," "−" "" "" "" "" "") 123.456001
+    --> "123,456001"
+
+    format (Locale (Max 3) "." "," "−" "" "" "" "" "") 123.45678
+    --> "123,457"
+
+    format (Locale (Max 3) "." "," "−" "" "" "" "" "") 123.45633
+    --> "123,456"
+
+    format (Locale (Max 3) "." "," "−" "" "" "" "" "") 123.45600
+    --> "123,456"
+
+    format (Locale (Max 3) "." "," "−" "" "" "" "" "") 123.45
+    --> "123,45"
+
+    format (Locale (Max 3) "." "," "−" "" "" "" "" "") 123
+    --> "123"
+
 -}
 format : Locales.Locale -> Float -> String
 format locale number_ =
