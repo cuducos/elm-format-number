@@ -1,7 +1,6 @@
 module Parser exposing (Category(..), FormattedNumber, classify, parse, splitThousands)
 
 import Char
-import FormatNumber.Humanize exposing (ZeroStrategy(..))
 import FormatNumber.Locales exposing (Decimals(..), Locale)
 import Round
 
@@ -100,9 +99,9 @@ splitThousands integers =
 
 {-| Given a `Locale` parses a `Float` into a `FormattedNumber`:
 
-    import FormatNumber.Locales exposing (usLocale)
+    import FormatNumber.Locales exposing (usLocale, Decimals(..))
 
-    parse { usLocale | decimals = 3 } 3.1415
+    parse { usLocale | decimals = Exact 3 } 3.1415
     --> { original = 3.1415
     --> , integers = ["3"]
     --> , decimals = "142"
@@ -110,7 +109,7 @@ splitThousands integers =
     --> , suffix = ""
     --> }
 
-    parse { usLocale | decimals = 3 } -3.1415
+    parse { usLocale | decimals = Exact 3 } -3.1415
     --> { original = -3.1415
     --> , integers = ["3"]
     --> , decimals = "141"
@@ -118,7 +117,7 @@ splitThousands integers =
     --> , suffix = ""
     --> }
 
-    parse { usLocale | decimals = 3, positiveSuffix = "+" } 3.1415
+    parse { usLocale | decimals = Exact 3, positiveSuffix = "+" } 3.1415
     --> { original = 3.1415
     --> , integers = ["3"]
     --> , decimals = "142"
@@ -150,7 +149,7 @@ splitThousands integers =
     --> , suffix = " "
     --> }
 
-    parse { usLocale | decimals = 0 } 1234567.89
+    parse { usLocale | decimals = Exact 0 } 1234567.89
     --> { original = 1234567.89
     --> , integers = ["1", "234", "568"]
     --> , decimals = ""
@@ -158,7 +157,7 @@ splitThousands integers =
     --> , suffix = ""
     --> }
 
-    parse { usLocale | decimals = 0 } -1234567.89
+    parse { usLocale | decimals = Exact 0 } -1234567.89
     --> { original = -1234567.89
     --> , integers = ["1", "234", "568"]
     --> , decimals = ""
@@ -166,7 +165,7 @@ splitThousands integers =
     --> , suffix = ""
     --> }
 
-    parse { usLocale | decimals = 1 } 999.9
+    parse { usLocale | decimals = Exact 1 } 999.9
     --> { original = 999.9
     --> , integers = ["999"]
     --> , decimals = "9"
@@ -174,7 +173,7 @@ splitThousands integers =
     --> , suffix = ""
     --> }
 
-    parse { usLocale | decimals = 1 } -999.9
+    parse { usLocale | decimals = Exact 1 } -999.9
     --> { original = -999.9
     --> , integers = ["999"]
     --> , decimals = "9"
@@ -206,7 +205,7 @@ splitThousands integers =
     --> , suffix = ""
     --> }
 
-    parse { usLocale | decimals = 1 } ((2 ^ 39) / 100)
+    parse { usLocale | decimals = Exact 1 } ((2 ^ 39) / 100)
     --> { original = 5497558138.88
     --> , integers = ["5", "497", "558", "138"]
     --> , decimals = "9"
@@ -214,7 +213,7 @@ splitThousands integers =
     --> , suffix = ""
     --> }
 
-    parse { usLocale | decimals = 1 } ((-2 ^ 39) / 100)
+    parse { usLocale | decimals = Exact 1 } ((-2 ^ 39) / 100)
     --> { original = -5497558138.88
     --> , integers = ["5", "497", "558", "138"]
     --> , decimals = "9"

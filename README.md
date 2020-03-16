@@ -32,22 +32,6 @@ format usLocale -pi --> "−3.14"
 format sharesLocale -pi --> "(3.142)"
 ```
 
-## Humanize
-
-The `humanize` function limits the number of decimals according to the `Locale` but may remove zeros from the tail in order to make it more humam readable. The `RemoveZero` removes any tail `0` from the result, while `KeepZeros` only remove decimals if _all_ decimal digits are `0`:
-
-```elm
-import FormatNumber exposing (humanize)
-import FormatNumber.Humanize exposing (ZeroStrategy(..))
-import FormatNumber.Locales exposing (usLocale)
-
-humanize usLocale RemoveZeros 10.00 --> "10"
-humanize usLocale RemoveZeros 10.10 --> "10.1"
-
-humanize usLocale KeepZeros 10.00 --> "10"
-humanize usLocale KeepZeros 10.10 --> "10.10"
-```
-
 ## Docs
 
 The API is further documented in [package.elm-lang.org](http://package.elm-lang.org/packages/cuducos/elm-format-number/latest/FormatNumber).
