@@ -99,7 +99,7 @@ splitThousands integers =
 
 {-| Given a `Locale` parses a `Float` into a `FormattedNumber`:
 
-    import FormatNumber.Locales exposing (usLocale, Decimals(..))
+    import FormatNumber.Locales exposing (Decimals(..), usLocale)
 
     parse { usLocale | decimals = Exact 3 } 3.1415
     --> { original = 3.1415

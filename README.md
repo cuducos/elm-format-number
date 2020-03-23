@@ -18,7 +18,7 @@ It is flexible enough to deal with different number of decimals, different thous
 
 ```elm
 import FormatNumber exposing (format)
-import FormatNumber.Locales exposing (Locale, usLocale, Decimals(..))
+import FormatNumber.Locales exposing (Decimals(..), Locale, usLocale)
 
 sharesLocale : Locale
 sharesLocale =
@@ -32,13 +32,13 @@ format usLocale -pi --> "−3.14"
 format sharesLocale -pi --> "(3.142)"
 ```
 
-### Decimals
+### The `Decimals` strategy type
 
 `Decimals` type contains different strategies for handling the number of decimals when formatting the number.
 
-1. `Min Int` - will show at least a certain amount of decimal digits, adding trailing zeros if needed
-2. `Max Int` - will show up to a certain amount of decimal digits, discarding trailing zeros if needed
-3. `Exact Int` - will show an exact number of decimal digits, adding trailing zeros if needed
+* `Min Int` shows at least a certain amount of decimal digits, adding trailing zeros if needed.
+* `Max Int` shows up to a certain amount of decimal digits, discarding trailing zeros if needed.
+* `Exact Int` shows an exact number of decimal digits, adding trailing zeros if needed.
 
 ## Docs
 

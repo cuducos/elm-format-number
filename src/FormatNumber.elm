@@ -28,7 +28,7 @@ import Stringfy exposing (stringfy)
 
 {-| Format a float number as a pretty string:
 
-    import FormatNumber.Locales exposing (Locale, frenchLocale, spanishLocale, usLocale, Decimals(..))
+    import FormatNumber.Locales exposing (Decimals(..), Locale, frenchLocale, spanishLocale, usLocale)
 
     format { decimals = Exact 2, thousandSeparator = ".", decimalSeparator = ",", negativePrefix = "−", negativeSuffix = "", positivePrefix = "", positiveSuffix = "", zeroPrefix = "", zeroSuffix = "" } 123456.789
     --> "123.456,79"
