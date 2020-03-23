@@ -1,8 +1,4 @@
-module FormatNumber.Locales exposing
-    ( Locale
-    , frenchLocale, spanishLocale, usLocale
-    , Decimals(..), base, getDecimals
-    )
+module FormatNumber.Locales exposing (Locale, frenchLocale, spanishLocale, usLocale, Decimals(..), base, getDecimals)
 
 {-| These locales and its names are based on this
 [International Language Environments
