@@ -60,7 +60,11 @@ numbers, but no suffix or prefix for positive numbers.
 -}
 frenchLocale : Locale
 frenchLocale =
-    Locale (Exact 3) "\u{202F}" "," "−" "" "" "" "" ""
+    { base
+        | decimals = Exact 3
+        , thousandSeparator = "\u{202F}"
+        , decimalSeparator = ","
+    }
 
 
 {-| Locale used in Spain, Italy and Norway. It has 3 decimals digits, uses a
@@ -70,7 +74,11 @@ positive numbers.
 -}
 spanishLocale : Locale
 spanishLocale =
-    Locale (Exact 3) "." "," "−" "" "" "" "" ""
+    { base
+        | decimals = Exact 3
+        , thousandSeparator = "."
+        , decimalSeparator = ","
+    }
 
 
 {-| Locale used in the United States, Great Britain and Thailand. It has 2
@@ -80,4 +88,7 @@ numbers, no suffix or prefix for positive numbers.
 -}
 usLocale : Locale
 usLocale =
-    Locale (Exact 2) "," "." "−" "" "" "" "" ""
+    { base
+        | decimals = Exact 2
+        , thousandSeparator = ","
+    }
