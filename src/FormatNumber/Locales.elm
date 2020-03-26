@@ -1,14 +1,19 @@
 module FormatNumber.Locales exposing
-    ( Locale
+    ( Decimals(..)
+    , Locale
+    , base
     , frenchLocale, spanishLocale, usLocale
-    , Decimals(..), base
     )
 
 {-| These locales and its names are based on this
 [International Language Environments
 Guide](https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html)
 
+@docs Decimals
+
 @docs Locale
+
+@docs base
 
 
 # Pre-defined locales
@@ -18,6 +23,17 @@ Guide](https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html)
 -}
 
 
+{-| The `Decimals` type contains different strategies for handling the number of
+decimals when formatting the number:
+
+  - `Min` `Int` shows at least a certain amount of decimal digits, adding
+    trailing zeros if needed.
+  - `Max` `Int` shows up to a certain amount of decimal digits, discarding
+    trailing zeros if needed.
+  - `Exact` `Int` shows an exact number of decimal digits, adding trailing
+    zeros if needed.
+
+-}
 type Decimals
     = Min Int
     | Max Int
@@ -39,6 +55,9 @@ type alias Locale =
     }
 
 
+{-| The `base` locale matches Elm's native `String.fromFloat` using unicode
+minus (`U+2212`) instead of an hyphen/dash.
+-}
 base : Locale
 base =
     { decimals = Min 0

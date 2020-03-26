@@ -14,7 +14,7 @@ format usLocale (pi * 1000)  --> "3,141.59"
 format spanishLocale (pi * 1000)  --> "3.141,593"
 ```
 
-It is flexible enough to deal with different number of decimals, different thousand separators, different decimal separator, and different ways to represent negative numbers — all that is possible using `Locale`s. `base` locale matches String.fromFloat using unicode minus (U+2212) − instead of hyphen/dash -.
+It is flexible enough to deal with different number of decimals, different thousand separators, different decimal separator, and different ways to represent negative numbers — all that is possible using `Locale`s. The `base` locale matches Elm's native `String.fromFloat` using unicode minus (`U+2212`) instead of an hyphen/dash.
 
 ```elm
 import FormatNumber exposing (format)
