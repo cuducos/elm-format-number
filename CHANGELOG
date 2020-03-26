@@ -1,10 +1,14 @@
 # Changelog
 
+**8.0.0** (Mar 25, 2020)
+  * Adds `Decimals` to `Locale` types  to simplify the API (thanks @malidukica & @jhf)
+  * Removes `humanize`
+
 **7.0.0** (Sep 12, 2019)
   * Add zero prefix and suffix (thanks @LemonIceScream)
 
 **6.2.0** (Sep 7, 2019)
-  * Expose `Humanize` module, enhancing documentation (thanks @ coinop-logan)
+  * Expose `Humanize` module, enhancing documentation (thanks @coinop-logan)
 
 **6.1.0** (Jul 21, 2019)
   * Add `humanize` function
