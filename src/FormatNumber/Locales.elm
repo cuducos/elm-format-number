@@ -1,4 +1,8 @@
-module FormatNumber.Locales exposing (Locale, frenchLocale, spanishLocale, usLocale, Decimals(..), base, getDecimals)
+module FormatNumber.Locales exposing
+    ( Locale
+    , frenchLocale, spanishLocale, usLocale
+    , Decimals(..), base
+    )
 
 {-| These locales and its names are based on this
 [International Language Environments
@@ -18,19 +22,6 @@ type Decimals
     = Min Int
     | Max Int
     | Exact Int
-
-
-getDecimals : Decimals -> Int
-getDecimals decimals =
-    case decimals of
-        Min numberOfDecimals ->
-            numberOfDecimals
-
-        Max numberOfDecimals ->
-            numberOfDecimals
-
-        Exact numberOfDecimals ->
-            numberOfDecimals
 
 
 {-| This is the `Locale` type and constructor.
