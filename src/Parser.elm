@@ -1,8 +1,9 @@
-module Parser exposing (Category(..), FormattedNumber, classify, parse, splitThousands)
+module Parser exposing (Category(..), FormattedNumber, addZerosToFit, classify, parse, removeZeros, splitInParts, splitThousands)
 
 import Char
 import FormatNumber.Locales exposing (Decimals(..), Locale)
 import Round
+import String
 
 
 {-| `Category` is a helper type and constructor to classify numbers in positive
@@ -95,6 +96,110 @@ splitThousands integers =
     integers
         |> reversedSplitThousands
         |> List.reverse
+
+
+{-| Given a `Locale` and a `Float`, returns a tuple with the integer and the
+decimal parts as strings.
+
+    import FormatNumber.Locales exposing (Decimals(..), usLocale)
+
+    splitInParts usLocale 3.1415
+    --> ("3", "14")
+
+    splitInParts { usLocale | decimals = Exact 0 } 3.1415
+    --> ("3", "")
+
+-}
+splitInParts : Locale -> Float -> ( String, String )
+splitInParts locale value =
+    let
+        toString : Float -> String
+        toString =
+            case locale.decimals of
+                Max max ->
+                    Round.round max
+
+                Min _ ->
+                    String.fromFloat
+
+                Exact exact ->
+                    Round.round exact
+
+        asList : List String
+        asList =
+            value |> toString |> String.split "."
+
+        integers : String
+        integers =
+            asList |> List.head |> Maybe.withDefault ""
+
+        decimals : String
+        decimals =
+            case List.tail asList of
+                Just values ->
+                    values |> List.head |> Maybe.withDefault ""
+
+                Nothing ->
+                    ""
+    in
+    ( integers, decimals )
+
+
+{-| Remove all zeros from the tail of a string.
+
+    removeZeros "100"
+    --> "1"
+
+-}
+removeZeros : String -> String
+removeZeros decimals =
+    if String.right 1 decimals /= "0" then
+        decimals
+
+    else
+        decimals
+            |> String.dropRight 1
+            |> removeZeros
+
+
+{-| Given a `String` adds zeros to its tail until it reaches `desiredLength`.
+
+    addZerosToFit 3 "1"
+    --> "100"
+
+-}
+addZerosToFit : Int -> String -> String
+addZerosToFit desiredLength value =
+    let
+        length : Int
+        length =
+            String.length value
+
+        missing : Int
+        missing =
+            if length < desiredLength then
+                abs <| desiredLength - length
+
+            else
+                0
+    in
+    value ++ String.repeat missing "0"
+
+
+{-| Given a `Locale`, and the decimals as `String`, this function handles the
+length of the string, removing or adding zeros as needed.
+-}
+getDecimals : Locale -> String -> String
+getDecimals locale digits =
+    case locale.decimals of
+        Max _ ->
+            removeZeros digits
+
+        Exact _ ->
+            digits
+
+        Min min ->
+            addZerosToFit min digits
 
 
 {-| Given a `Locale` parses a `Float` into a `FormattedNumber`:
@@ -225,63 +330,22 @@ splitThousands integers =
 parse : Locale -> Float -> FormattedNumber
 parse locale original =
     let
-        parts : List String
+        parts : ( String, String )
         parts =
-            original
-                |> (case locale.decimals of
-                        Max max ->
-                            Round.round max
-
-                        Min _ ->
-                            String.fromFloat
-
-                        Exact exact ->
-                            Round.round exact
-                   )
-                |> String.split "."
+            splitInParts locale original
 
         integers : List String
         integers =
             parts
-                |> List.head
-                |> Maybe.withDefault "0"
+                |> Tuple.first
                 |> String.filter Char.isDigit
                 |> splitThousands
 
         decimals : String
         decimals =
             parts
-                |> List.drop 1
-                |> List.head
-                |> (\maybeDigits ->
-                        case locale.decimals of
-                            Max _ ->
-                                maybeDigits
-                                    |> Maybe.map removeZeros
-                                    |> Maybe.withDefault ""
-
-                            Exact _ ->
-                                maybeDigits
-                                    |> Maybe.withDefault ""
-
-                            Min min ->
-                                let
-                                    decimalDigits =
-                                        maybeDigits
-                                            |> Maybe.withDefault ""
-
-                                    digitsLength =
-                                        String.length decimalDigits
-
-                                    missingDigits =
-                                        if digitsLength < min then
-                                            abs <| digitsLength - min
-
-                                        else
-                                            0
-                                in
-                                decimalDigits ++ String.repeat missingDigits "0"
-                   )
+                |> Tuple.second
+                |> getDecimals locale
 
         partial : FormattedNumber
         partial =
@@ -305,16 +369,3 @@ parse locale original =
                 | prefix = locale.zeroPrefix
                 , suffix = locale.zeroSuffix
             }
-
-
-{-| Remove all zeros from the tail of a string.
--}
-removeZeros : String -> String
-removeZeros decimals =
-    if String.right 1 decimals /= "0" then
-        decimals
-
-    else
-        decimals
-            |> String.dropRight 1
-            |> removeZeros
