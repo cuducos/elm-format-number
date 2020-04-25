@@ -72,6 +72,42 @@ base =
     }
 
 
+{-| To format numbers we use elm-format-number package because, we cannot use Number.toLocaleString() directly.
+To determine locale number format we use magic string passed via flags like so:
+`Elm.Client.init({ flags: { numberFormat: (-1111.111111).toLocaleString() } })`
+To actually get number format in form needed for elm-format-number we use this function.
+Note: it does not cover the case with zero decimal places.
+
+[More information](https://github.com/cuducos/elm-format-number/issues/27).
+
+-}
+parseLocale : String -> Locale
+parseLocale a =
+    let
+        ( negativePrefix, thousandSeparator, decimalSeparator ) =
+            case a |> String.replace "1" "" |> String.toList of
+                neg :: thousand :: dec :: [] ->
+                    ( String.fromChar neg, String.fromChar thousand, String.fromChar dec )
+
+                _ ->
+                    ( base.negativePrefix, base.thousandSeparator, base.decimalSeparator )
+
+        decimals =
+            case a |> String.split decimalSeparator of
+                _ :: dec :: [] ->
+                    Locales.Exact (String.length dec)
+
+                _ ->
+                    base.decimals
+    in
+    { base
+        | decimals = decimals
+        , negativePrefix = negativePrefix
+        , thousandSeparator = thousandSeparator
+        , decimalSeparator = decimalSeparator
+    }
+
+
 {-| Locale used in France, Canada, Finland and Sweden. It has 3 decimals
 digits, uses a thin space (`U+202F`) as thousand separator and a `,` as decimal
 separator. It uses a minus sign (not a hyphen) as a prefix for negative
