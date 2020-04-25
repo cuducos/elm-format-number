@@ -2,6 +2,7 @@ module FormatNumber.Locales exposing
     ( Decimals(..)
     , Locale
     , base
+    , fromString
     , frenchLocale, spanishLocale, usLocale
     )
 
@@ -15,12 +16,16 @@ Guide](https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html)
 
 @docs base
 
+@docs fromString
+
 
 # Pre-defined locales
 
 @docs frenchLocale, spanishLocale, usLocale
 
 -}
+
+import Regex
 
 
 {-| The `Decimals` type contains different strategies for handling the number of
@@ -72,40 +77,81 @@ base =
     }
 
 
-{-| To format numbers we use elm-format-number package because, we cannot use Number.toLocaleString() directly.
-To determine locale number format we use magic string passed via flags like so:
-`Elm.Client.init({ flags: { numberFormat: (-1111.111111).toLocaleString() } })`
-To actually get number format in form needed for elm-format-number we use this function.
-Note: it does not cover the case with zero decimal places.
+{-| Reads a JavaScript's `Number.toLocaleString()` return value to create the
+`Locale` according to the user's local settings. This is useful when combined
+with [Elm's Flags](https://guide.elm-lang.org/interop/flags.html), e.g.:
 
-[More information](https://github.com/cuducos/elm-format-number/issues/27).
+    Elm.Client.init
+        { flags =
+            { numberFormat = (Math.PI * -1000).toLocaleString ()
+            }
+        }
+
+Then we use `fromString` to read this value from the flag (although it does
+not cover the case with zero decimal places). **If it fails to parse the string
+to a `Locale`, it will return the `base` locale**.
+
+    fromString "-3,141.593"
+    --> { base
+    --> | decimals = Exact 3
+    --> , thousandSeparator = "
+    --> , decimalSeparator = "."
+    --> , negativePrefix = "-"
+    --> }
 
 -}
-parseLocale : String -> Locale
-parseLocale a =
+fromString : String -> Locale
+fromString value =
     let
-        ( negativePrefix, thousandSeparator, decimalSeparator ) =
-            case a |> String.replace "1" "" |> String.toList of
-                neg :: thousand :: dec :: [] ->
-                    ( String.fromChar neg, String.fromChar thousand, String.fromChar dec )
+        regex : Regex.Regex
+        regex =
+            "\\D"
+                |> Regex.fromString
+                |> Maybe.withDefault Regex.never
+
+        cleaned : String
+        cleaned =
+            Regex.replace regex (\_ -> "") value
+
+        partial : Locale
+        partial =
+            case String.toList cleaned of
+                negativePrefix :: thousandSeparator :: decimalSeparator :: negativeSuffix :: [] ->
+                    { base
+                        | negativePrefix = String.fromChar negativePrefix
+                        , thousandSeparator = String.fromChar thousandSeparator
+                        , decimalSeparator = String.fromChar decimalSeparator
+                        , negativeSuffix = String.fromChar negativeSuffix
+                    }
+
+                negativePrefix :: thousandSeparator :: decimalSeparator :: [] ->
+                    { base
+                        | negativePrefix = String.fromChar negativePrefix
+                        , thousandSeparator = String.fromChar thousandSeparator
+                        , decimalSeparator = String.fromChar decimalSeparator
+                    }
 
                 _ ->
-                    ( base.negativePrefix, base.thousandSeparator, base.decimalSeparator )
+                    base
 
+        decimals : Int
         decimals =
-            case a |> String.split decimalSeparator of
-                _ :: dec :: [] ->
-                    Locales.Exact (String.length dec)
+            case String.split partial.decimalSeparator value of
+                _ :: digits :: [] ->
+                    String.length digits
 
                 _ ->
-                    base.decimals
+                    case partial.decimals of
+                        Exact amount ->
+                            amount
+
+                        Min amount ->
+                            amount
+
+                        Max amount ->
+                            amount
     in
-    { base
-        | decimals = decimals
-        , negativePrefix = negativePrefix
-        , thousandSeparator = thousandSeparator
-        , decimalSeparator = decimalSeparator
-    }
+    { partial | decimals = Exact decimals }
 
 
 {-| Locale used in France, Canada, Finland and Sweden. It has 3 decimals
