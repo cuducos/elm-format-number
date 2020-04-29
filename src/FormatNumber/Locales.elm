@@ -82,11 +82,11 @@ base =
 with [Elm's Flags](https://guide.elm-lang.org/interop/flags.html), e.g.:
 
 ```js
-Elm.Main.init({
+Elm.Main.init\({
   flags: {
     numberFormat: (Math.PI * -1000).toLocaleString()
   }
-})
+}\)
 ```
 
 Then we use `fromString` to read this value from the flag (although it does
