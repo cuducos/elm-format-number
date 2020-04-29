@@ -81,11 +81,13 @@ base =
 `Locale` according to the user's local settings. This is useful when combined
 with [Elm's Flags](https://guide.elm-lang.org/interop/flags.html), e.g.:
 
-    Elm.Client.init
-        { flags =
-            { numberFormat = (Math.PI * -1000).toLocaleString ()
-            }
-        }
+```js
+Elm.Main.init\({
+  flags: {
+    numberFormat: (Math.PI * -1000).toLocaleString()
+  }
+}\)
+```
 
 Then we use `fromString` to read this value from the flag (although it does
 not cover the case with zero decimal places). **If it fails to parse the string
