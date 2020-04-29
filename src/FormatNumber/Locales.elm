@@ -134,24 +134,16 @@ fromString value =
                 _ ->
                     base
 
-        decimals : Int
+        decimals : Decimals
         decimals =
             case String.split partial.decimalSeparator value of
                 _ :: digits :: [] ->
-                    String.length digits
+                    Exact (String.length digits)
 
                 _ ->
-                    case partial.decimals of
-                        Exact amount ->
-                            amount
-
-                        Min amount ->
-                            amount
-
-                        Max amount ->
-                            amount
+                    partial.decimals
     in
-    { partial | decimals = Exact decimals }
+    { partial | decimals = decimals }
 
 
 {-| Locale used in France, Canada, Finland and Sweden. It has 3 decimals
