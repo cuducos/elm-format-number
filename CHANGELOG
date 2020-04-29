@@ -1,5 +1,8 @@
 # Changelog
 
+**8.1.1** (Apr 29, 2020)
+  * Fixes `Locale.fromString` documentation (and minor refactor; thanks again @pravdomil)
+
 **8.1.0** (Apr 25, 2020)
   * Adds `Locale.fromString` (thanks @pravdomil)
 
