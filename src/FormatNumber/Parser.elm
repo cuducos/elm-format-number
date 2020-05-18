@@ -1,4 +1,13 @@
-module Parser exposing (Category(..), FormattedNumber, addZerosToFit, classify, parse, removeZeros, splitInParts, splitThousands)
+module FormatNumber.Parser exposing
+    ( Category(..)
+    , FormattedNumber
+    , addZerosToFit
+    , classify
+    , parse
+    , removeZeros
+    , splitInParts
+    , splitThousands
+    )
 
 import Char
 import FormatNumber.Locales exposing (Decimals(..), Locale)

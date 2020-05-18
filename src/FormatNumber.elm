@@ -22,8 +22,8 @@ Just convert them to `Float` before passing them to `format`:
 -}
 
 import FormatNumber.Locales as Locales
-import Parser exposing (parse)
-import Stringfy exposing (stringfy)
+import FormatNumber.Parser exposing (parse)
+import FormatNumber.Stringfy exposing (stringfy)
 
 
 {-| Format a float number as a pretty string:
@@ -139,5 +139,5 @@ import Stringfy exposing (stringfy)
 format : Locales.Locale -> Float -> String
 format locale number_ =
     number_
-        |> Parser.parse locale
-        |> Stringfy.stringfy locale
+        |> parse locale
+        |> stringfy locale
