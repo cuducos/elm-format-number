@@ -1,7 +1,7 @@
-module Stringfy exposing (formatDecimals, stringfy)
+module FormatNumber.Stringfy exposing (formatDecimals, stringfy)
 
 import FormatNumber.Locales exposing (Decimals(..), Locale)
-import Parser exposing (FormattedNumber)
+import FormatNumber.Parser exposing (FormattedNumber)
 
 
 {-| Stringify a `FormattedNumber`:
