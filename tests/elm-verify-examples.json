@@ -1,4 +1,4 @@
 {
   "root": "../src",
-  "tests": [ "FormatNumber", "./README.md" ]
+  "tests": [ "FormatNumber", "FormatNumber.Locales", "./README.md" ]
 }
