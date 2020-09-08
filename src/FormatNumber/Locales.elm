@@ -96,7 +96,7 @@ to a `Locale`, it will return the `base` locale**.
     fromString "-3,141.593"
     --> { base
     --> | decimals = Exact 3
-    --> , thousandSeparator = "
+    --> , thousandSeparator = ","
     --> , decimalSeparator = "."
     --> , negativePrefix = "-"
     --> }
@@ -107,7 +107,7 @@ fromString value =
     let
         regex : Regex.Regex
         regex =
-            "\\D"
+            "\\d"
                 |> Regex.fromString
                 |> Maybe.withDefault Regex.never
 
