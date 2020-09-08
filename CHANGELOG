@@ -1,5 +1,8 @@
 # Changelog
 
+**8.1.3** (Sep 8, 2020)
+  * Fix regular expression that caused error in `Locales.fromString` (thanks @kdelwat)
+
 **8.1.2** (May 18, 2020)
   * Moves `Stringfy` and `Parser` to a namespace under `FormatNumber`
 
