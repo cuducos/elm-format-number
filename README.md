@@ -1,4 +1,4 @@
-# Elm Format Number [![Build Status](https://circleci.com/gh/cuducos/elm-format-number.svg?style=shield)](https://circleci.com/gh/cuducos/elm-format-number)
+# Elm Format Number ![Build](https://github.com/cuducos/elm-format-number/workflows/Build/badge.svg)
 
 This simple [Elm](https://elm-lang.org) package formats `Float` numbers as pretty strings.
 
