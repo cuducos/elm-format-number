@@ -60,8 +60,12 @@ type alias Locale =
     }
 
 
-{-| The `base` locale matches Elm's native `String.fromFloat` using unicode
-minus (`U+2212`) instead of an hyphen/dash.
+{-| The `base` locale uses unicode minus (`U+2212`) instead of a hyphen/dash 
+for visual consistency.
+Note that `String.toFloat` only considers hypen as the minus sign and 
+will return `Nothing` for negative number strings formatted in `base` locale.
+Consider creating your own locale with hypen as the `negativePrefix` or use a custom 
+string to float function that handles `U+2212` if need be.  
 -}
 base : Locale
 base =
