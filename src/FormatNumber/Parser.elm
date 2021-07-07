@@ -106,14 +106,15 @@ splitThousands integers =
         |> reversedSplitThousands
         |> List.reverse
 
-{-| Split a `String` in `List String` grouping by digits as per Indian 
-numbering system. Last 3 digits are grouped together but after that 
-numbers are grouped in two. 
-[Indian numbering system](https://en.wikipedia.org/wiki/Indian_numbering_system#Use_of_separators):
+{-| Splits `String` into `List String` grouping by digits as `Indian`. Last 3
+digits are grouped together but after that numbers are grouped in pairs. For
+more details:
+[Indian numbering system](https://en.wikipedia.org/wiki/Indian_numbering_system#Use_of_separators).
 
     splitByIndian "12345678" --> [ "1", "23", "45", "678" ]
 
     splitByIndian "12" --> [ "12" ]
+
 
 -}
 splitByIndian : String -> List String
