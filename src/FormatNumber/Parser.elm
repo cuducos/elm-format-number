@@ -10,7 +10,7 @@ module FormatNumber.Parser exposing
     )
 
 import Char
-import FormatNumber.Locales exposing (Decimals(..), Locale)
+import FormatNumber.Locales exposing (Decimals(..), Locale, NumericSystem(..))
 import Round
 import String
 
@@ -106,6 +106,41 @@ splitThousands integers =
         |> reversedSplitThousands
         |> List.reverse
 
+{-| Split a `String` in `List String` grouping by digits as per Indian 
+numbering system. Last 3 digits are grouped together but after that 
+numbers are grouped in two. 
+[Indian numbering system](https://en.wikipedia.org/wiki/Indian_numbering_system#Use_of_separators):
+
+    splitByIndian "12345678" --> [ "1", "23", "45", "678" ]
+
+    splitByIndian "12" --> [ "12" ]
+
+-}
+splitByIndian : String -> List String
+splitByIndian integers =
+    let
+        reversedSplitHundreds : String -> List String
+        reversedSplitHundreds value =
+            if String.length value > 2 then
+                value
+                    |> String.dropRight 2
+                    |> reversedSplitHundreds
+                    |> (::) (String.right 2 value)
+
+            else if String.length value == 0 then
+                []
+            else
+                [ value ]
+        
+        thousand : String
+        thousand = 
+            if String.length integers > 3 then
+                String.right 3 integers
+            else
+                integers
+    in
+    List.reverse
+        <| thousand :: (integers |> String.dropRight 3 |> reversedSplitHundreds)
 
 {-| Given a `Locale` and a `Float`, returns a tuple with the integer and the
 decimal parts as strings.
@@ -209,6 +244,26 @@ getDecimals locale digits =
 
         Min min ->
             addZerosToFit min digits
+
+{-| Given a 'NumericSystem` parses a integer `String` into 
+a `List String` representing grouped integers:
+
+    - Western NumericSystem: 1000000 -> 1,000,000
+    - Indian NumericSystem: 1000000 -> 10,00,000
+-}
+
+splitIntegers : NumericSystem -> String -> List String
+splitIntegers numericSystem integers = 
+    case numericSystem of
+        Western -> 
+            integers
+                |> String.filter Char.isDigit
+                |> splitThousands
+        Indian ->
+            integers
+                |> String.filter Char.isDigit
+                |> splitByIndian
+
 
 
 {-| Given a `Locale` parses a `Float` into a `FormattedNumber`:
@@ -335,6 +390,22 @@ getDecimals locale digits =
     --> , suffix = ""
     --> }
 
+    parse { usLocale | numericSystem = Indian, decimals = Exact 1 } ((-2 ^ 39) / 100)
+    --> { original = -5497558138.88
+    --> , integers = ["5", "49", "75", "58", "138"]
+    --> , decimals = "9"
+    --> , prefix = "−"
+    --> , suffix = ""
+    --> }
+
+    parse { usLocale | numericSystem = Indian, decimals = Exact 1 } 15
+    --> { original = -5497558138.88
+    --> , integers = ["15"]
+    --> , decimals = "0"
+    --> , prefix = ""
+    --> , suffix = ""
+    --> }
+
 -}
 parse : Locale -> Float -> FormattedNumber
 parse locale original =
@@ -348,7 +419,7 @@ parse locale original =
             parts
                 |> Tuple.first
                 |> String.filter Char.isDigit
-                |> splitThousands
+                |> splitIntegers locale.numericSystem
 
         decimals : String
         decimals =
