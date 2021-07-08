@@ -1,4 +1,10 @@
 {
   "root": "../src",
-  "tests": [ "FormatNumber", "FormatNumber.Locales", "./README.md" ]
+  "tests": [
+    "FormatNumber",
+    "FormatNumber.Locales",
+    "FormatNumber.Parser",
+    "FormatNumber.Stringfy",
+    "./README.md"
+  ]
 }

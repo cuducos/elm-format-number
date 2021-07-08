@@ -7,7 +7,7 @@ import FormatNumber.Parser exposing (FormattedNumber)
 {-| Stringify a `FormattedNumber`:
 
     import FormatNumber.Locales exposing (Locale, Decimals(..))
-    import Parser exposing (FormattedNumber)
+    import FormatNumber.Parser exposing (FormattedNumber)
 
     stringfy (Locale (Exact 3) "." "," "−" "" "" "" "" "") (FormattedNumber 3.1415 ["3"] "142" "" "")
     --> "3,142"
