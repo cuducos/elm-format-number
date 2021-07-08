@@ -117,6 +117,7 @@ more details:
 
     splitByIndian "12" --> [ "12" ]
 
+
 -}
 splitByIndian : String -> List String
 splitByIndian integers =
