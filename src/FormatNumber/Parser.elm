@@ -6,7 +6,9 @@ module FormatNumber.Parser exposing
     , parse
     , removeZeros
     , splitInParts
-    , splitThousands
+    , splitByWestern
+    , splitByIndian
+    , splitIntegers
     )
 
 import Char
@@ -83,13 +85,13 @@ classify formatted =
 
 {-| Split a `String` in `List String` grouping by thousands digits:
 
-    splitThousands "12345" --> [ "12", "345" ]
+    splitByWestern "12345" --> [ "12", "345" ]
 
-    splitThousands "12" --> [ "12" ]
+    splitByWestern "12" --> [ "12" ]
 
 -}
-splitThousands : String -> List String
-splitThousands integers =
+splitByWestern : String -> List String
+splitByWestern integers =
     let
         reversedSplitThousands : String -> List String
         reversedSplitThousands value =
@@ -106,10 +108,10 @@ splitThousands integers =
         |> reversedSplitThousands
         |> List.reverse
 
-{-| Split a `String` in `List String` grouping by digits as per Indian 
-numbering system. Last 3 digits are grouped together but after that 
-numbers are grouped in two. 
-[Indian numbering system](https://en.wikipedia.org/wiki/Indian_numbering_system#Use_of_separators):
+{-| Splits `String` into `List String` grouping by digits as `Indian`. Last 3
+digits are grouped together but after that numbers are grouped in pairs. For
+more details:
+[Indian numbering system](https://en.wikipedia.org/wiki/Indian_numbering_system#Use_of_separators).
 
     splitByIndian "12345678" --> [ "1", "23", "45", "678" ]
 
@@ -139,8 +141,11 @@ splitByIndian integers =
             else
                 integers
     in
-    List.reverse
-        <| thousand :: (integers |> String.dropRight 3 |> reversedSplitHundreds)
+    integers
+        |> String.dropRight 3
+        |> reversedSplitHundreds
+        |> (::) thousand
+        |> List.reverse
 
 {-| Given a `Locale` and a `Float`, returns a tuple with the integer and the
 decimal parts as strings.
@@ -248,8 +253,12 @@ getDecimals locale digits =
 {-| Given a 'NumericSystem` parses a integer `String` into 
 a `List String` representing grouped integers:
 
-    - Western NumericSystem: 1000000 -> 1,000,000
-    - Indian NumericSystem: 1000000 -> 10,00,000
+    import FormatNumber.Locales exposing (NumericSystem(..))
+
+    splitIntegers Western "1000000" --> ["1", "000", "000"]
+
+    splitIntegers Indian "1000000" --> ["10", "00", "000"]
+
 -}
 
 splitIntegers : NumericSystem -> String -> List String
@@ -258,7 +267,7 @@ splitIntegers numericSystem integers =
         Western -> 
             integers
                 |> String.filter Char.isDigit
-                |> splitThousands
+                |> splitByWestern
         Indian ->
             integers
                 |> String.filter Char.isDigit
@@ -268,7 +277,7 @@ splitIntegers numericSystem integers =
 
 {-| Given a `Locale` parses a `Float` into a `FormattedNumber`:
 
-    import FormatNumber.Locales exposing (Decimals(..), usLocale)
+    import FormatNumber.Locales exposing (Decimals(..), usLocale, NumericSystem(..))
 
     parse { usLocale | decimals = Exact 3 } 3.1415
     --> { original = 3.1415
@@ -399,7 +408,7 @@ splitIntegers numericSystem integers =
     --> }
 
     parse { usLocale | numericSystem = Indian, decimals = Exact 1 } 15
-    --> { original = -5497558138.88
+    --> { original = 15
     --> , integers = ["15"]
     --> , decimals = "0"
     --> , prefix = ""

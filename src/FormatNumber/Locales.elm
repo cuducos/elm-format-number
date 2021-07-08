@@ -48,9 +48,10 @@ type Decimals
 {-| The 'NumericSystem' type contains different numeric systems currently 
 supported:
 
-  - Western - It separates digits by 1000s. 1000000 -> 1,000,000
-  - Indian - It separates digits by 1000 then it is separated by 100s. 
-    1000000 -> 10,00,000
+  - `Western` separates digits by thousands (e.g.: 1000000 might be separated
+    as 1,000,000).
+  - `Indian` separates digits by the thousand and, from there, by hundreds
+    (e.g.: 1000000 might be separated as 10,00,000).
 
 -}
 type NumericSystem
