@@ -117,7 +117,6 @@ more details:
 
     splitByIndian "12" --> [ "12" ]
 
-
 -}
 splitByIndian : String -> List String
 splitByIndian integers =
@@ -251,7 +250,7 @@ getDecimals locale digits =
         Min min ->
             addZerosToFit min digits
 
-{-| Given a 'NumericSystem` parses a integer `String` into 
+{-| Given a 'NumericSystem` parses an integer `String` into
 a `List String` representing grouped integers:
 
     import FormatNumber.Locales exposing (NumericSystem(..))
@@ -261,7 +260,6 @@ a `List String` representing grouped integers:
     splitIntegers Indian "1000000" --> ["10", "00", "000"]
 
 -}
-
 splitIntegers : NumericSystem -> String -> List String
 splitIntegers numericSystem integers = 
     case numericSystem of

@@ -45,7 +45,7 @@ type Decimals
     | Max Int
     | Exact Int
 
-{-| The 'NumericSystem' type contains different numeric systems currently 
+{-| The `NumericSystem` type contains different numeric systems currently
 supported:
 
   - `Western` separates digits by thousands (e.g.: 1000000 might be separated
