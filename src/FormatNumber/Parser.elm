@@ -3,7 +3,9 @@ module FormatNumber.Parser exposing
     , FormattedNumber
     , addZerosToFit
     , classify
+    , joinParts
     , parse
+    , parseString
     , removeZeros
     , splitInParts
     , splitThousands
@@ -11,6 +13,7 @@ module FormatNumber.Parser exposing
 
 import Char
 import FormatNumber.Locales exposing (Decimals(..), Locale)
+import Regex
 import Round
 import String
 
@@ -211,6 +214,67 @@ getDecimals locale digits =
             addZerosToFit min digits
 
 
+
+{- Joins parts into `Maybe Float`. It expects parts to be strings with only digits.
+
+   joinParts ("100", "235")
+   --> Just 100.235
+
+   joinParts ("", "534")
+   --> Just 0.534
+
+   joinParts ("243", "")
+   --> Just 243
+
+   joinParts ("", "")
+   --> Nothing
+
+   joinParts ("100,00", "243")
+   --> Nothing
+
+   joinParts ("10000", "24,3")
+   --> Nothing
+
+-}
+
+
+joinParts : ( String, String ) -> Maybe Float
+joinParts parts =
+    let
+        decimalCount : Float
+        decimalCount =
+            parts
+                |> Tuple.second
+                |> String.length
+                |> toFloat
+
+        integers : Maybe Float
+        integers =
+            parts
+                |> Tuple.first
+                |> String.toFloat
+
+        decimalValue : Maybe Float
+        decimalValue =
+            parts
+                |> Tuple.second
+                |> String.toFloat
+                |> Maybe.map (\n -> n / (10 ^ decimalCount))
+    in
+    case parts of
+        ( "", "" ) ->
+            Nothing
+
+        ( _, "" ) ->
+            integers
+
+        ( "", _ ) ->
+            decimalValue
+
+        _ ->
+            Maybe.map2 (+) integers decimalValue
+
+
 {-| Given a `Locale` parses a `Float` into a `FormattedNumber`:
 
     import FormatNumber.Locales exposing (Decimals(..), usLocale)
@@ -378,3 +442,54 @@ parse locale original =
                 | prefix = locale.zeroPrefix
                 , suffix = locale.zeroSuffix
             }
+
+
+{-| Given a `Locale` parses a `String` into a `Maybe Float`
+-}
+parseString : Locale -> String -> Maybe Float
+parseString locale value =
+    let
+        isNegative : Bool
+        isNegative =
+            String.startsWith locale.negativePrefix value
+                && String.endsWith
+                    locale.negativeSuffix
+                    value
+
+        notDigits : Regex.Regex
+        notDigits =
+            "\\D"
+                |> Regex.fromString
+                |> Maybe.withDefault Regex.never
+        
+        onlyDigits : String -> String
+        onlyDigits = 
+            Regex.replace notDigits (\_ -> "")
+
+        splitValue : String -> List String
+        splitValue number =
+            number
+                |> String.split locale.decimalSeparator
+                |> List.map onlyDigits
+    in
+    case splitValue value of
+        integers :: decimals :: [] ->
+            if isNegative then
+                ( integers, decimals )
+                    |> joinParts
+                    |> Maybe.map (negate)
+
+            else
+                joinParts ( integers, decimals )
+
+        integers :: [] ->
+            if isNegative then
+                ( integers, "" )
+                    |> joinParts
+                    |> Maybe.map (negate)
+
+            else
+                joinParts ( integers, "" )
+
+        _ ->
+            Nothing
