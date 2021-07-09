@@ -1,6 +1,7 @@
 module FormatNumber.Locales exposing
     ( Decimals(..)
     , Locale
+    , NumericSystem(..)
     , base
     , fromString
     , frenchLocale, spanishLocale, usLocale
@@ -44,6 +45,19 @@ type Decimals
     | Max Int
     | Exact Int
 
+{-| The `NumericSystem` type contains different numeric systems currently
+supported:
+
+  - `Western` separates digits by thousands (e.g.: 1000000 might be separated
+    as 1,000,000).
+  - `Indian` separates digits by the thousand and, from there, by hundreds
+    (e.g.: 1000000 might be separated as 10,00,000).
+
+-}
+type NumericSystem
+    = Western
+    | Indian
+
 
 {-| This is the `Locale` type and constructor.
 -}
@@ -57,6 +71,7 @@ type alias Locale =
     , positiveSuffix : String
     , zeroPrefix : String
     , zeroSuffix : String
+    , numericSystem : NumericSystem
     }
 
 
@@ -83,6 +98,7 @@ base =
     , positiveSuffix = ""
     , zeroPrefix = ""
     , zeroSuffix = ""
+    , numericSystem = Western
     }
 
 

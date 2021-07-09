@@ -6,11 +6,13 @@ module FormatNumber.Parser exposing
     , parse
     , removeZeros
     , splitInParts
-    , splitThousands
+    , splitByWestern
+    , splitByIndian
+    , splitIntegers
     )
 
 import Char
-import FormatNumber.Locales exposing (Decimals(..), Locale)
+import FormatNumber.Locales exposing (Decimals(..), Locale, NumericSystem(..))
 import Round
 import String
 
@@ -83,13 +85,13 @@ classify formatted =
 
 {-| Split a `String` in `List String` grouping by thousands digits:
 
-    splitThousands "12345" --> [ "12", "345" ]
+    splitByWestern "12345" --> [ "12", "345" ]
 
-    splitThousands "12" --> [ "12" ]
+    splitByWestern "12" --> [ "12" ]
 
 -}
-splitThousands : String -> List String
-splitThousands integers =
+splitByWestern : String -> List String
+splitByWestern integers =
     let
         reversedSplitThousands : String -> List String
         reversedSplitThousands value =
@@ -106,6 +108,44 @@ splitThousands integers =
         |> reversedSplitThousands
         |> List.reverse
 
+{-| Splits `String` into `List String` grouping by digits as `Indian`. Last 3
+digits are grouped together but after that numbers are grouped in pairs. For
+more details:
+[Indian numbering system](https://en.wikipedia.org/wiki/Indian_numbering_system#Use_of_separators).
+
+    splitByIndian "12345678" --> [ "1", "23", "45", "678" ]
+
+    splitByIndian "12" --> [ "12" ]
+
+-}
+splitByIndian : String -> List String
+splitByIndian integers =
+    let
+        reversedSplitHundreds : String -> List String
+        reversedSplitHundreds value =
+            if String.length value > 2 then
+                value
+                    |> String.dropRight 2
+                    |> reversedSplitHundreds
+                    |> (::) (String.right 2 value)
+
+            else if String.length value == 0 then
+                []
+            else
+                [ value ]
+        
+        thousand : String
+        thousand = 
+            if String.length integers > 3 then
+                String.right 3 integers
+            else
+                integers
+    in
+    integers
+        |> String.dropRight 3
+        |> reversedSplitHundreds
+        |> (::) thousand
+        |> List.reverse
 
 {-| Given a `Locale` and a `Float`, returns a tuple with the integer and the
 decimal parts as strings.
@@ -210,10 +250,33 @@ getDecimals locale digits =
         Min min ->
             addZerosToFit min digits
 
+{-| Given a 'NumericSystem` parses an integer `String` into
+a `List String` representing grouped integers:
+
+    import FormatNumber.Locales exposing (NumericSystem(..))
+
+    splitIntegers Western "1000000" --> ["1", "000", "000"]
+
+    splitIntegers Indian "1000000" --> ["10", "00", "000"]
+
+-}
+splitIntegers : NumericSystem -> String -> List String
+splitIntegers numericSystem integers = 
+    case numericSystem of
+        Western -> 
+            integers
+                |> String.filter Char.isDigit
+                |> splitByWestern
+        Indian ->
+            integers
+                |> String.filter Char.isDigit
+                |> splitByIndian
+
+
 
 {-| Given a `Locale` parses a `Float` into a `FormattedNumber`:
 
-    import FormatNumber.Locales exposing (Decimals(..), usLocale)
+    import FormatNumber.Locales exposing (Decimals(..), usLocale, NumericSystem(..))
 
     parse { usLocale | decimals = Exact 3 } 3.1415
     --> { original = 3.1415
@@ -335,6 +398,22 @@ getDecimals locale digits =
     --> , suffix = ""
     --> }
 
+    parse { usLocale | numericSystem = Indian, decimals = Exact 1 } ((-2 ^ 39) / 100)
+    --> { original = -5497558138.88
+    --> , integers = ["5", "49", "75", "58", "138"]
+    --> , decimals = "9"
+    --> , prefix = "−"
+    --> , suffix = ""
+    --> }
+
+    parse { usLocale | numericSystem = Indian, decimals = Exact 1 } 15
+    --> { original = 15
+    --> , integers = ["15"]
+    --> , decimals = "0"
+    --> , prefix = ""
+    --> , suffix = ""
+    --> }
+
 -}
 parse : Locale -> Float -> FormattedNumber
 parse locale original =
@@ -348,7 +427,7 @@ parse locale original =
             parts
                 |> Tuple.first
                 |> String.filter Char.isDigit
-                |> splitThousands
+                |> splitIntegers locale.numericSystem
 
         decimals : String
         decimals =
