@@ -26,6 +26,7 @@ Guide](https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html)
 -}
 
 import Regex
+import List.Extra exposing(unique)
 
 
 {-| The `Decimals` type contains different strategies for handling the number of
@@ -110,6 +111,14 @@ to a `Locale`, it will return the `base` locale**.
     --> , negativePrefix = "-"
     --> }
 
+    fromString "-1,300,141.593"
+    --> { base
+    --> | decimals = Exact 3
+    --> , thousandSeparator = ","
+    --> , decimalSeparator = "."
+    --> , negativePrefix = "-"
+    --> }
+
 -}
 fromString : String -> Locale
 fromString value =
@@ -120,13 +129,16 @@ fromString value =
                 |> Regex.fromString
                 |> Maybe.withDefault Regex.never
 
-        cleaned : String
+        cleaned : List Char
         cleaned =
-            Regex.replace regex (\_ -> "") value
+            value
+                |> Regex.replace regex (\_ -> "")
+                |> String.toList
+                |> List.Extra.unique
 
         partial : Locale
         partial =
-            case String.toList cleaned of
+            case cleaned of
                 negativePrefix :: thousandSeparator :: decimalSeparator :: negativeSuffix :: [] ->
                     { base
                         | negativePrefix = String.fromChar negativePrefix
