@@ -4,6 +4,7 @@ module FormatNumber.Parser exposing
     , addZerosToFit
     , classify
     , parse
+    , parseString
     , removeZeros
     , splitInParts
     , splitThousands
@@ -13,6 +14,7 @@ import Char
 import FormatNumber.Locales exposing (Decimals(..), Locale)
 import Round
 import String
+import Regex
 
 
 {-| `Category` is a helper type and constructor to classify numbers in positive
@@ -378,3 +380,40 @@ parse locale original =
                 | prefix = locale.zeroPrefix
                 , suffix = locale.zeroSuffix
             }
+
+{-| Given a `Locale` parses a `String` into a `Maybe Float`:
+-}
+parseString : Locale -> String -> Maybe Float
+parseString locale value = 
+    let
+        isNegative : Bool
+        isNegative = 
+            if String.left 1 value == locale.negativePrefix then
+                True
+            else
+                False
+        chrs : Regex.Regex
+        chrs = 
+            ["[", locale.negativePrefix, locale.negativeSuffix, locale.thousandSeparator, "]"]
+                |> String.concat
+                |> Regex.fromString
+                |> Maybe.withDefault Regex.never
+        splitValue : String -> List String
+        splitValue nbr = 
+            nbr
+                |> Regex.replace chrs (\_ -> "")
+                |> String.split locale.decimalSeparator
+        sumNumber : Float -> Float -> Float -> Float
+        sumNumber i d pow =
+            if isNegative then
+                -1 * (i + d/(10^pow))
+            else
+                i + d/(10^pow)
+    in
+        case splitValue value of
+            integer :: decimal :: [] ->
+                Maybe.map3 (sumNumber) (String.toFloat integer) (String.toFloat decimal) (Just (toFloat (String.length decimal)))
+            integer :: [] ->
+                Maybe.map (\n -> if isNegative then -1 * n else n) (String.toFloat integer)
+            _ -> 
+                Nothing
