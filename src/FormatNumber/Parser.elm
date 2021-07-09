@@ -12,9 +12,9 @@ module FormatNumber.Parser exposing
 
 import Char
 import FormatNumber.Locales exposing (Decimals(..), Locale)
+import Regex
 import Round
 import String
-import Regex
 
 
 {-| `Category` is a helper type and constructor to classify numbers in positive
@@ -381,39 +381,60 @@ parse locale original =
                 , suffix = locale.zeroSuffix
             }
 
-{-| Given a `Locale` parses a `String` into a `Maybe Float`:
+
+{-| Given a `Locale` parses a `String` into a `Maybe Float`
 -}
 parseString : Locale -> String -> Maybe Float
-parseString locale value = 
+parseString locale value =
     let
         isNegative : Bool
-        isNegative = 
-            if String.left 1 value == locale.negativePrefix then
-                True
-            else
-                False
+        isNegative =
+            negativePrefixMatch && negativeSuffixMatch
+
+        negativePrefixMatch : Bool
+        negativePrefixMatch =
+            value
+                |> String.startsWith locale.negativePrefix
+
+        negativeSuffixMatch : Bool
+        negativeSuffixMatch =
+            value
+                |> String.endsWith locale.negativeSuffix
+
         chrs : Regex.Regex
-        chrs = 
-            ["[", locale.negativePrefix, locale.negativeSuffix, locale.thousandSeparator, "]"]
-                |> String.concat
+        chrs =
+            "[^\\d]"
                 |> Regex.fromString
                 |> Maybe.withDefault Regex.never
+
         splitValue : String -> List String
-        splitValue nbr = 
+        splitValue nbr =
             nbr
-                |> Regex.replace chrs (\_ -> "")
                 |> String.split locale.decimalSeparator
+                |> List.map (Regex.replace chrs (\_ -> ""))
+
         sumNumber : Float -> Float -> Float -> Float
         sumNumber i d pow =
             if isNegative then
-                -1 * (i + d/(10^pow))
+                -1 * (i + d / (10 ^ pow))
+
             else
-                i + d/(10^pow)
+                i + d / (10 ^ pow)
     in
-        case splitValue value of
-            integer :: decimal :: [] ->
-                Maybe.map3 (sumNumber) (String.toFloat integer) (String.toFloat decimal) (Just (toFloat (String.length decimal)))
-            integer :: [] ->
-                Maybe.map (\n -> if isNegative then -1 * n else n) (String.toFloat integer)
-            _ -> 
-                Nothing
+    case splitValue value of
+        integer :: decimal :: [] ->
+            Maybe.map3 sumNumber (String.toFloat integer) (String.toFloat decimal) (Just (toFloat (String.length decimal)))
+
+        integer :: [] ->
+            Maybe.map
+                (\n ->
+                    if isNegative then
+                        -1 * n
+
+                    else
+                        n
+                )
+                (String.toFloat integer)
+
+        _ ->
+            Nothing
