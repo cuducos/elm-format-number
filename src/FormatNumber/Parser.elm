@@ -477,7 +477,7 @@ parseString locale value =
             if isNegative then
                 ( integers, decimals )
                     |> joinParts
-                    |> Maybe.map2 (*) (Just -1.0)
+                    |> Maybe.map (negate)
 
             else
                 joinParts ( integers, decimals )
@@ -486,7 +486,7 @@ parseString locale value =
             if isNegative then
                 ( integers, "" )
                     |> joinParts
-                    |> Maybe.map2 (*) (Just -1.0)
+                    |> Maybe.map (negate)
 
             else
                 joinParts ( integers, "" )
