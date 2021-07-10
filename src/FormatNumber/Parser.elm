@@ -456,17 +456,21 @@ parseString locale value =
                     locale.negativeSuffix
                     value
 
-        matchCharacters : Regex.Regex
-        matchCharacters =
+        notDigits : Regex.Regex
+        notDigits =
             "\\D"
                 |> Regex.fromString
                 |> Maybe.withDefault Regex.never
+        
+        onlyDigits : String -> String
+        onlyDigits = 
+            Regex.replace notDigits (\_ -> "")
 
         splitValue : String -> List String
         splitValue number =
             number
                 |> String.split locale.decimalSeparator
-                |> List.map (Regex.replace matchCharacters (\_ -> ""))
+                |> List.map onlyDigits
     in
     case splitValue value of
         integers :: decimals :: [] ->
