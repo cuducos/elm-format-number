@@ -3,6 +3,7 @@ module FormatNumber.Parser exposing
     , FormattedNumber
     , addZerosToFit
     , classify
+    , joinParts
     , parse
     , parseString
     , removeZeros
@@ -213,6 +214,67 @@ getDecimals locale digits =
             addZerosToFit min digits
 
 
+
+{- Joins parts into `Maybe Float`. It expects parts to be strings with only digits.
+
+   joinParts ("100", "235")
+   --> Just 100.235
+
+   joinParts ("", "534")
+   --> Just 0.534
+
+   joinParts ("243", "")
+   --> Just 243
+
+   joinParts ("", "")
+   --> Nothing
+
+   joinParts ("100,00", "243")
+   --> Nothing
+
+   joinParts ("10000", "24,3")
+   --> Nothing
+
+-}
+
+
+joinParts : ( String, String ) -> Maybe Float
+joinParts parts =
+    let
+        decimalCount : Float
+        decimalCount =
+            parts
+                |> Tuple.second
+                |> String.length
+                |> toFloat
+
+        integers : Maybe Float
+        integers =
+            parts
+                |> Tuple.first
+                |> String.toFloat
+
+        decimalValue : Maybe Float
+        decimalValue =
+            parts
+                |> Tuple.second
+                |> String.toFloat
+                |> Maybe.map (\n -> n / (10 ^ decimalCount))
+    in
+    case parts of
+        ( "", "" ) ->
+            Nothing
+
+        ( _, "" ) ->
+            integers
+
+        ( "", _ ) ->
+            decimalValue
+
+        _ ->
+            Maybe.map2 (+) integers decimalValue
+
+
 {-| Given a `Locale` parses a `Float` into a `FormattedNumber`:
 
     import FormatNumber.Locales exposing (Decimals(..), usLocale)
@@ -389,52 +451,41 @@ parseString locale value =
     let
         isNegative : Bool
         isNegative =
-            negativePrefixMatch && negativeSuffixMatch
+            String.startsWith locale.negativePrefix value
+                && String.endsWith
+                    locale.negativeSuffix
+                    value
 
-        negativePrefixMatch : Bool
-        negativePrefixMatch =
-            value
-                |> String.startsWith locale.negativePrefix
-
-        negativeSuffixMatch : Bool
-        negativeSuffixMatch =
-            value
-                |> String.endsWith locale.negativeSuffix
-
-        chrs : Regex.Regex
-        chrs =
-            "[^\\d]"
+        matchCharacters : Regex.Regex
+        matchCharacters =
+            "\\D"
                 |> Regex.fromString
                 |> Maybe.withDefault Regex.never
 
         splitValue : String -> List String
-        splitValue nbr =
-            nbr
+        splitValue number =
+            number
                 |> String.split locale.decimalSeparator
-                |> List.map (Regex.replace chrs (\_ -> ""))
-
-        sumNumber : Float -> Float -> Float -> Float
-        sumNumber i d pow =
-            if isNegative then
-                -1 * (i + d / (10 ^ pow))
-
-            else
-                i + d / (10 ^ pow)
+                |> List.map (Regex.replace matchCharacters (\_ -> ""))
     in
     case splitValue value of
-        integer :: decimal :: [] ->
-            Maybe.map3 sumNumber (String.toFloat integer) (String.toFloat decimal) (Just (toFloat (String.length decimal)))
+        integers :: decimals :: [] ->
+            if isNegative then
+                ( integers, decimals )
+                    |> joinParts
+                    |> Maybe.map2 (*) (Just -1.0)
 
-        integer :: [] ->
-            Maybe.map
-                (\n ->
-                    if isNegative then
-                        -1 * n
+            else
+                joinParts ( integers, decimals )
 
-                    else
-                        n
-                )
-                (String.toFloat integer)
+        integers :: [] ->
+            if isNegative then
+                ( integers, "" )
+                    |> joinParts
+                    |> Maybe.map2 (*) (Just -1.0)
+
+            else
+                joinParts ( integers, "" )
 
         _ ->
             Nothing

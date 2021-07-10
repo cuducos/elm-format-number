@@ -162,6 +162,9 @@ format locale number_ =
     parse { base | negativePrefix = " ~", negativeSuffix = "" } " ~100,000"
     --> Just -100000
 
+    parse { base | negativePrefix = " ~", negativeSuffix = "" } "100,000"
+    --> Just 100000
+
     parse { base | thousandSeparator = ",", negativePrefix = "(", negativeSuffix = ")" } "(100,000.546)"
     --> Just -100000.546
 
