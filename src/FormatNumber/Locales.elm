@@ -3,8 +3,8 @@ module FormatNumber.Locales exposing
     , Locale
     , base
     , fromString
-    , frenchLocale, spanishLocale, usLocale
     , NumericSystem(..)
+    , frenchLocale, spanishLocale, usLocale, indianLocale
     )
 
 {-| These locales and its names are based on this
@@ -22,7 +22,7 @@ Guide](https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html)
 
 # Pre-defined locales
 
-@docs frenchLocale, spanishLocale, usLocale
+@docs frenchLocale, indianLocale, spanishLocale, usLocale
 
 -}
 
@@ -279,6 +279,18 @@ frenchLocale =
         | decimals = Exact 3
         , thousandSeparator = "\u{202F}"
         , decimalSeparator = ","
+    }
+
+
+{-| Locale used in India. It is similar to `usLocale`, but uses the `Indian`
+numeric system.
+-}
+indianLocale : Locale
+indianLocale =
+    { base
+        | decimals = Exact 2
+        , thousandSeparator = ","
+        , numericSystem = Indian
     }
 
 
