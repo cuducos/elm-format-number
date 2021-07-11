@@ -4,7 +4,7 @@ module FormatNumber.Locales exposing
     , System(..)
     , base
     , fromString
-    , frenchLocale, spanishLocale, usLocale, indianLocale
+    , frenchLocale, indianLocale, spanishLocale, usLocale
     )
 
 {-| These locales and its names are based on this
@@ -105,9 +105,10 @@ base =
     }
 
 
-{-| Reads a JavaScript's `Number.toLocaleString()` return value to create the
-`Locale` according to the user's local settings. This is useful when combined
-with [Elm's Flags](https://guide.elm-lang.org/interop/flags.html), e.g.:
+{-| Reads a JavaScript's `Number.toLocaleString()` return value to try to
+create a `Locale` according to the user's local settings. This is useful when
+combined with [Elm's Flags](https://guide.elm-lang.org/interop/flags.html),
+e.g.:
 
 ```js
 Elm.Main.init\({
@@ -123,18 +124,20 @@ The input `value` should be a number that offers enough hints so `fromString`
 can make a informed prediction of the `Locale`:
 
   - the number needs to be negative to predict the negative suffix and prefix
+
   - the number needs to have decimals to predict the decimal separator
+
   - the number needs use different separators for thousands and for decimals to
     predict these separators
+
   - the number's module needs to be greater than (or equal to) 100.000 and
     lesser than (or equal to) 999.999 to predict the right numeric system, i.e.
     `Western` or `Indian`
 
-**If it fails to parse the string to a `Locale`, it will return the `base`
-locale**.
+    fromString "3.1415" -> Nothing
 
     fromString "-314,159.265"
-    --> { base
+    --> Just { base
     --> | decimals = Exact 3
     --> , thousandSeparator = ","
     --> , decimalSeparator = "."
@@ -142,7 +145,7 @@ locale**.
     --> }
 
     fromString "-3,14,159.265"
-    --> { base
+    --> Just { base
     --> | decimals = Exact 3
     --> , thousandSeparator = ","
     --> , decimalSeparator = "."
@@ -151,7 +154,7 @@ locale**.
     --> }
 
 -}
-fromString : String -> Locale
+fromString : String -> Maybe Locale
 fromString value =
     let
         negativePrefixRegex : Regex.Regex
@@ -213,60 +216,68 @@ fromString value =
                 |> Set.size
                 |> (==) 1
 
-        partial : Locale
+        partial : Maybe Locale
         partial =
             if isEmpty then
-                { base
-                    | negativePrefix = negativePrefix
-                    , negativeSuffix = negativeSuffix
-                }
+                Nothing
 
             else if onlyOne then
-                { base
-                    | negativePrefix = negativePrefix
-                    , negativeSuffix = negativeSuffix
-                    , decimalSeparator = cleaned |> List.head |> Maybe.withDefault ""
-                }
+                Nothing
 
             else if allTheSame then
-                { base
-                    | negativePrefix = negativePrefix
-                    , negativeSuffix = negativeSuffix
-                    , thousandSeparator = cleaned |> List.head |> Maybe.withDefault ""
-                }
+                Nothing
 
             else
-                { base
-                    | negativePrefix = negativePrefix
-                    , negativeSuffix = negativeSuffix
-                    , decimalSeparator = cleaned |> List.reverse |> List.head |> Maybe.withDefault ""
-                    , thousandSeparator = cleaned |> List.head |> Maybe.withDefault ""
-                }
+                Just
+                    { base
+                        | negativePrefix = negativePrefix
+                        , negativeSuffix = negativeSuffix
+                        , decimalSeparator = cleaned |> List.reverse |> List.head |> Maybe.withDefault ""
+                        , thousandSeparator = cleaned |> List.head |> Maybe.withDefault ""
+                    }
 
-        decimals : Decimals
+        decimals : Maybe Decimals
         decimals =
-            if String.isEmpty partial.decimalSeparator then
-                partial.decimals
+            case partial of
+                Just locale ->
+                    if String.isEmpty locale.decimalSeparator then
+                        Nothing
+
+                    else
+                        case String.split locale.decimalSeparator value of
+                            _ :: digits :: [] ->
+                                digits
+                                    |> String.length
+                                    |> Exact
+                                    |> Just
+
+                            _ ->
+                                Nothing
+
+                _ ->
+                    Nothing
+
+        updateDecimalsAndSystem : Locale -> Decimals -> Maybe Locale
+        updateDecimalsAndSystem locale dec =
+            let
+                thousandSeparators : Int
+                thousandSeparators =
+                    cleaned
+                        |> List.filter (\s -> s == locale.thousandSeparator)
+                        |> List.length
+            in
+            if thousandSeparators == 1 then
+                Just { locale | decimals = dec }
+
+            else if thousandSeparators == 2 then
+                Just { locale | decimals = dec, system = Indian }
 
             else
-                case String.split partial.decimalSeparator value of
-                    _ :: digits :: [] ->
-                        Exact (String.length digits)
-
-                    _ ->
-                        partial.decimals
-
-        thousandSeparators : Int
-        thousandSeparators =
-            cleaned
-                |> List.filter (\s -> s == partial.thousandSeparator)
-                |> List.length
+                Nothing
     in
-    if thousandSeparators == 2 then
-        { partial | decimals = decimals, system = Indian }
-
-    else
-        { partial | decimals = decimals }
+    decimals
+        |> Maybe.map2 updateDecimalsAndSystem partial
+        |> Maybe.withDefault Nothing
 
 
 {-| Locale used in France, Canada, Finland and Sweden. It has 3 decimals
