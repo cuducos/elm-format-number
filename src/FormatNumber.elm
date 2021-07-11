@@ -28,33 +28,33 @@ import FormatNumber.Stringfy exposing (stringfy)
 
 {-| Format a float number as a pretty string:
 
-    import FormatNumber.Locales exposing (Decimals(..), NumericSystem(..), Locale, frenchLocale, spanishLocale, usLocale)
+    import FormatNumber.Locales exposing (Decimals(..), Locale, System(..), frenchLocale, spanishLocale, usLocale)
 
-    format { decimals = Exact 2, thousandSeparator = ".", decimalSeparator = ",", negativePrefix = "−", negativeSuffix = "", positivePrefix = "", positiveSuffix = "", zeroPrefix = "", zeroSuffix = "", numericSystem = Western } 123456.789
+    format { decimals = Exact 2, system = Western, thousandSeparator = ".", decimalSeparator = ",", negativePrefix = "−", negativeSuffix = "", positivePrefix = "", positiveSuffix = "", zeroPrefix = "", zeroSuffix = "" } 123456.789
     --> "123.456,79"
 
-    format { decimals = Exact 2, thousandSeparator = ",", decimalSeparator = ".", negativePrefix = "−", negativeSuffix = "", positivePrefix = "", positiveSuffix = "", zeroPrefix = "", zeroSuffix = "", numericSystem = Western } 1234.5567
+    format { decimals = Exact 2, system = Western, thousandSeparator = ",", decimalSeparator = ".", negativePrefix = "−", negativeSuffix = "", positivePrefix = "", positiveSuffix = "", zeroPrefix = "", zeroSuffix = "" } 1234.5567
     --> "1,234.56"
 
-    format (Locale (Exact 3) "." "," "−" "" "" "" "" "" Western) -7654.3210
+    format (Locale (Exact 3) Western "." "," "−" "" "" "" "" "") -7654.3210
     --> "−7.654,321"
 
-    format (Locale (Exact 1) "," "." "−" "" "" "" "" "" Western) -0.01
+    format (Locale (Exact 1) Western "," "." "−" "" "" "" "" "") -0.01
     --> "0.0"
 
-    format (Locale (Exact 2) "," "." "−" "" "" "" "" "" Western) 0.01
+    format (Locale (Exact 2) Western "," "." "−" "" "" "" "" "") 0.01
     --> "0.01"
 
-    format (Locale (Exact 0) "," "." "−" "" "" "" "" "" Western) 123.456
+    format (Locale (Exact 0) Western "," "." "−" "" "" "" "" "") 123.456
     --> "123"
 
-    format (Locale (Exact 0) "," "." "−" "" "" "" "" "" Western) 1e9
+    format (Locale (Exact 0) Western "," "." "−" "" "" "" "" "") 1e9
     --> "1,000,000,000"
 
-    format (Locale (Exact 5) "," "." "−" "" "" "" "" "" Western) 1.0
+    format (Locale (Exact 5) Western "," "." "−" "" "" "" "" "") 1.0
     --> "1.00000"
 
-    format (Locale (Exact 2) "," "." "(" ")" "" "" "" "" Western) -1.0
+    format (Locale (Exact 2) Western "," "." "(" ")" "" "" "" "") -1.0
     --> "(1.00)"
 
     format usLocale pi
@@ -105,40 +105,40 @@ import FormatNumber.Stringfy exposing (stringfy)
     format usLocale 7.34767309e-22
     --> "0.00"
 
-    format (Locale (Exact 3) "." "," "−" "" "" "" "" "" Western) 123
+    format (Locale (Exact 3) Western "." "," "−" "" "" "" "" "") 123
     --> "123,000"
 
-    format (Locale (Min 3) "." "," "−" "" "" "" "" "" Western) 123.45678
+    format (Locale (Min 3) Western "." "," "−" "" "" "" "" "") 123.45678
     --> "123,45678"
 
-    format (Locale (Min 0) "." "," "−" "" "" "" "" "" Western) 1230
+    format (Locale (Min 0) Western "." "," "−" "" "" "" "" "") 1230
     --> "1.230"
 
-    format (Locale (Min 3) "." "," "−" "" "" "" "" "" Western) 123.45600
+    format (Locale (Min 3) Western "." "," "−" "" "" "" "" "") 123.45600
     --> "123,456"
 
-    format (Locale (Min 3) "." "," "−" "" "" "" "" "" Western) 123.456001
+    format (Locale (Min 3) Western "." "," "−" "" "" "" "" "") 123.456001
     --> "123,456001"
 
-    format (Locale (Max 3) "." "," "−" "" "" "" "" "" Western) 123.45678
+    format (Locale (Max 3) Western "." "," "−" "" "" "" "" "") 123.45678
     --> "123,457"
 
-    format (Locale (Max 3) "." "," "−" "" "" "" "" "" Western) 123.45633
+    format (Locale (Max 3) Western "." "," "−" "" "" "" "" "") 123.45633
     --> "123,456"
 
-    format (Locale (Max 3) "." "," "−" "" "" "" "" "" Western) 123.45600
+    format (Locale (Max 3) Western "." "," "−" "" "" "" "" "") 123.45600
     --> "123,456"
 
-    format (Locale (Max 3) "." "," "−" "" "" "" "" "" Western) 123.45
+    format (Locale (Max 3) Western "." "," "−" "" "" "" "" "") 123.45
     --> "123,45"
 
-    format (Locale (Max 3) "." "," "−" "" "" "" "" "" Western) 123
+    format (Locale (Max 3) Western "." "," "−" "" "" "" "" "") 123
     --> "123"
 
-    format { usLocale | numericSystem = Indian } 7.34767309e22
+    format { usLocale | system = Indian } 7.34767309e22
     --> "73,47,67,30,90,00,00,00,00,00,000.00"
 
-    format { usLocale | numericSystem = Indian } 75
+    format { usLocale | system = Indian } 75
     --> "75.00"
 
 -}

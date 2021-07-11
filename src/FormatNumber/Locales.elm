@@ -1,9 +1,9 @@
 module FormatNumber.Locales exposing
     ( Decimals(..)
     , Locale
+    , System(..)
     , base
     , fromString
-    , NumericSystem(..)
     , frenchLocale, spanishLocale, usLocale, indianLocale
     )
 
@@ -14,6 +14,8 @@ Guide](https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html)
 @docs Decimals
 
 @docs Locale
+
+@docs System
 
 @docs base
 
@@ -47,8 +49,7 @@ type Decimals
     | Exact Int
 
 
-{-| The `NumericSystem` type contains different numeric systems currently
-supported:
+{-| The `System` type contains different numeric systems currently supported:
 
   - `Western` separates digits by thousands (e.g.: 1000000 might be separated
     as 1,000,000).
@@ -56,7 +57,7 @@ supported:
     (e.g.: 1000000 might be separated as 10,00,000).
 
 -}
-type NumericSystem
+type System
     = Western
     | Indian
 
@@ -65,6 +66,7 @@ type NumericSystem
 -}
 type alias Locale =
     { decimals : Decimals
+    , system : System
     , thousandSeparator : String
     , decimalSeparator : String
     , negativePrefix : String
@@ -73,12 +75,11 @@ type alias Locale =
     , positiveSuffix : String
     , zeroPrefix : String
     , zeroSuffix : String
-    , numericSystem : NumericSystem
     }
 
 
-{-| The `base` locale uses unicode minus (`U+2212`) instead of a hyphen/dash
-for visual consistency.
+{-| The `base` locale is a `Western` numeric system which uses unicode minus
+(`U+2212`) instead of a hyphen/dash for visual consistency.
 
 Note that `String.toFloat` does not understand unicode minus (`U+2212`), thus
 it will return `Nothing` for negative number strings formatted using `base`
@@ -100,7 +101,7 @@ base =
     , positiveSuffix = ""
     , zeroPrefix = ""
     , zeroSuffix = ""
-    , numericSystem = Western
+    , system = Western
     }
 
 
@@ -146,7 +147,7 @@ locale**.
     --> , thousandSeparator = ","
     --> , decimalSeparator = "."
     --> , negativePrefix = "-"
-    --> , numericSystem = Indian
+    --> , system = Indian
     --> }
 
 -}
@@ -262,7 +263,7 @@ fromString value =
                 |> List.length
     in
     if thousandSeparators == 2 then
-        { partial | decimals = decimals, numericSystem = Indian }
+        { partial | decimals = decimals, system = Indian }
 
     else
         { partial | decimals = decimals }
@@ -290,7 +291,7 @@ indianLocale =
     { base
         | decimals = Exact 2
         , thousandSeparator = ","
-        , numericSystem = Indian
+        , system = Indian
     }
 
 
