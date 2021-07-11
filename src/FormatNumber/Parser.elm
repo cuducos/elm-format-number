@@ -133,9 +133,9 @@ splitByIndian integers =
                 []
             else
                 [ value ]
-        
+
         thousand : String
-        thousand = 
+        thousand =
             if String.length integers > 3 then
                 String.right 3 integers
             else
@@ -261,9 +261,9 @@ a `List String` representing grouped integers:
 
 -}
 splitIntegers : NumericSystem -> String -> List String
-splitIntegers numericSystem integers = 
+splitIntegers numericSystem integers =
     case numericSystem of
-        Western -> 
+        Western ->
             integers
                 |> String.filter Char.isDigit
                 |> splitByWestern
