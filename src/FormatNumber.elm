@@ -1,4 +1,7 @@
-module FormatNumber exposing (format)
+module FormatNumber exposing
+    ( format
+    , parse
+    )
 
 {-| This simple package formats `Float` numbers as pretty strings. It is
 flexible enough to deal with different number of decimals, different thousand
@@ -22,7 +25,7 @@ Just convert them to `Float` before passing them to `format`:
 -}
 
 import FormatNumber.Locales as Locales
-import FormatNumber.Parser exposing (parse)
+import FormatNumber.Parser as Parser
 import FormatNumber.Stringfy exposing (stringfy)
 
 
@@ -139,5 +142,33 @@ import FormatNumber.Stringfy exposing (stringfy)
 format : Locales.Locale -> Float -> String
 format locale number_ =
     number_
-        |> parse locale
+        |> Parser.parse locale
         |> stringfy locale
+
+
+{-| Parses a pretty string into `Maybe Float`:
+
+    import FormatNumber.Locales exposing (Decimals(..), Locale, base, frenchLocale, spanishLocale, usLocale)
+
+    parse { base | thousandSeparator = "," } "100,000.345"
+    --> Just 100000.345
+
+    parse { base | thousandSeparator = ",", negativePrefix = "-" } "-100#000"
+    --> Just -100000
+
+    parse { base | negativePrefix = "", negativeSuffix = "-" } "100,000-"
+    --> Just -100000
+
+    parse { base | negativePrefix = " ~", negativeSuffix = "" } " ~100,000"
+    --> Just -100000
+
+    parse { base | negativePrefix = " ~", negativeSuffix = "" } "100,000"
+    --> Just 100000
+
+    parse { base | thousandSeparator = ",", negativePrefix = "(", negativeSuffix = ")" } "(100,000.546)"
+    --> Just -100000.546
+
+-}
+parse : Locales.Locale -> String -> Maybe Float
+parse locale str =
+    Parser.parseString locale str
