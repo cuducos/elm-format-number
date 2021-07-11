@@ -215,7 +215,8 @@ getDecimals locale digits =
 
 
 
-{- Joins parts into `Maybe Float`. It expects parts to be strings with only digits.
+{- Joins parts into `Maybe Float`. It expects parts to be strings with only
+digits.
 
    joinParts ("100", "235")
    --> Just 100.235
@@ -236,8 +237,6 @@ getDecimals locale digits =
    --> Nothing
 
 -}
-
-
 joinParts : ( String, String ) -> Maybe Float
 joinParts parts =
     let
@@ -477,7 +476,7 @@ parseString locale value =
             if isNegative then
                 ( integers, decimals )
                     |> joinParts
-                    |> Maybe.map (negate)
+                    |> Maybe.map negate
 
             else
                 joinParts ( integers, decimals )
@@ -486,7 +485,7 @@ parseString locale value =
             if isNegative then
                 ( integers, "" )
                     |> joinParts
-                    |> Maybe.map (negate)
+                    |> Maybe.map negate
 
             else
                 joinParts ( integers, "" )
