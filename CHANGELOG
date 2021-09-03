@@ -1,5 +1,11 @@
 # Changelog
 
+**9.0.0** (Sep 2, 2021)
+   * Adds supports to different numeric systems: Western and Indian
+   * Adds `indianLocale` to work with Lakhs and Crores
+   * Enhances use cases of `fromString` for more precise results
+   * Adds missing modules to the test suite
+
 **8.1.4** (Sep 19, 2020)
   * Clarify `base` locale behavior when compared to `String.toFloat` (thanks @aszenz)
 
