@@ -1,5 +1,8 @@
 # Changelog
 
+**9.0.1** (Nov 30, 2021)
+   * Fixes typo in the documentation (thanks @jcmrva)
+
 **9.0.0** (Sep 2, 2021)
    * Adds supports to different numeric systems: Western and Indian
    * Adds `indianLocale` to work with Lakhs and Crores
