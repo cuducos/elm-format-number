@@ -16,7 +16,7 @@ Just convert them to `Float` before passing them to `format`:
     "1,234.00"
 
     >>> import FormatNumber.Locales exposing (usLocale)
-    >>> format { usLocale | decimals = 0 } <| toFloat 1234
+    >>> format { usLocale | decimals = Exact 0 } <| toFloat 1234
     "1,234"
 
 -}
